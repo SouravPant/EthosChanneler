@@ -82,7 +82,35 @@ function App() {
           <h1 className="text-xl font-semibold text-gray-900 mb-2">Welcome to Ethos Network</h1>
           <p className="text-gray-600 mb-6">Connect with Farcaster to access your reputation dashboard</p>
           <Button 
-            onClick={() => farcasterSDK.signIn()}
+            onClick={async () => {
+              try {
+                const signInResult = await farcasterSDK.signIn();
+                const context = await farcasterSDK.getContext();
+                
+                if (context.user) {
+                  // Mock user data based on Farcaster context
+                  const mockUser: User = {
+                    id: 1,
+                    fid: context.user.fid,
+                    username: context.user.username,
+                    displayName: context.user.displayName,
+                    pfpUrl: context.user.pfpUrl || null,
+                    bio: context.user.bio || null,
+                    ethosAddress: "0x1234567890123456789012345678901234567890",
+                    credibilityScore: 847,
+                    vouchesReceived: 23,
+                    vouchesGiven: 12,
+                    reviewsGiven: 156,
+                    networkSize: 89,
+                    createdAt: new Date("2025-01-01"),
+                    updatedAt: new Date(),
+                  };
+                  setUser(mockUser);
+                }
+              } catch (error) {
+                console.error("Failed to sign in:", error);
+              }
+            }}
             className="w-full"
             size="lg"
           >

@@ -25,8 +25,8 @@ export const vouches = pgTable("vouches", {
   voucheeId: integer("vouchee_id").notNull().references(() => users.id),
   stakeAmount: decimal("stake_amount", { precision: 18, scale: 8 }).notNull(),
   reason: text("reason"),
-  isActive: boolean("is_active").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const reviews = pgTable("reviews", {
@@ -35,7 +35,7 @@ export const reviews = pgTable("reviews", {
   revieweeId: integer("reviewee_id").notNull().references(() => users.id),
   rating: integer("rating").notNull(), // 1 = down, 2 = neutral, 3 = up
   comment: text("comment"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const activities = pgTable("activities", {
@@ -44,15 +44,15 @@ export const activities = pgTable("activities", {
   actorId: integer("actor_id").references(() => users.id),
   type: text("type").notNull(), // 'vouch_received', 'vouch_given', 'review_given', 'network_joined'
   description: text("description").notNull(),
-  scoreChange: integer("score_change").default(0),
-  createdAt: timestamp("created_at").defaultNow(),
+  scoreChange: integer("score_change").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const connections = pgTable("connections", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),
   connectedUserId: integer("connected_user_id").notNull().references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({

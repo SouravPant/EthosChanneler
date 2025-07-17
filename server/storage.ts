@@ -136,6 +136,9 @@ export class MemStorage implements IStorage {
     const user: User = {
       id: this.currentUserId++,
       ...insertUser,
+      pfpUrl: insertUser.pfpUrl || null,
+      bio: insertUser.bio || null,
+      ethosAddress: insertUser.ethosAddress || null,
       credibilityScore: 0,
       vouchesReceived: 0,
       vouchesGiven: 0,
@@ -170,6 +173,7 @@ export class MemStorage implements IStorage {
     const vouch: Vouch = {
       id: this.currentVouchId++,
       ...insertVouch,
+      reason: insertVouch.reason || null,
       isActive: true,
       createdAt: new Date(),
     };
@@ -198,6 +202,7 @@ export class MemStorage implements IStorage {
     const review: Review = {
       id: this.currentReviewId++,
       ...insertReview,
+      comment: insertReview.comment || null,
       createdAt: new Date(),
     };
     this.reviews.set(review.id, review);
@@ -220,6 +225,8 @@ export class MemStorage implements IStorage {
     const activity: Activity = {
       id: this.currentActivityId++,
       ...insertActivity,
+      actorId: insertActivity.actorId || null,
+      scoreChange: insertActivity.scoreChange || 0,
       createdAt: new Date(),
     };
     this.activities.set(activity.id, activity);
