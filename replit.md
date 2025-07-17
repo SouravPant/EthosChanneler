@@ -22,6 +22,7 @@ Preferred communication style: Simple, everyday language.
 - **Framework**: Express.js with TypeScript
 - **Database**: PostgreSQL with Drizzle ORM
 - **Database Provider**: Neon Database (serverless PostgreSQL)
+- **Storage**: DatabaseStorage class implementing full CRUD operations
 - **API Design**: RESTful endpoints with JSON responses
 - **Session Management**: PostgreSQL session store with connect-pg-simple
 

@@ -15,6 +15,8 @@ import {
   type Connection,
   type InsertConnection,
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc, and } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -264,4 +266,151 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByFid(fid: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.fid, fid));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async getSuggestedUsers(userId: number, limit: number): Promise<User[]> {
+    const suggestedUsers = await db
+      .select()
+      .from(users)
+      .orderBy(desc(users.credibilityScore))
+      .limit(limit + 1);
+    
+    return suggestedUsers.filter(user => user.id !== userId).slice(0, limit);
+  }
+
+  async createVouch(insertVouch: InsertVouch): Promise<Vouch> {
+    const [vouch] = await db
+      .insert(vouches)
+      .values(insertVouch)
+      .returning();
+    return vouch;
+  }
+
+  async getVouchesByUser(userId: number): Promise<Vouch[]> {
+    return await db
+      .select()
+      .from(vouches)
+      .where(eq(vouches.voucherId, userId))
+      .orderBy(desc(vouches.createdAt));
+  }
+
+  async getVouchesForUser(userId: number): Promise<Vouch[]> {
+    return await db
+      .select()
+      .from(vouches)
+      .where(eq(vouches.voucheeId, userId))
+      .orderBy(desc(vouches.createdAt));
+  }
+
+  async getVouchBetweenUsers(voucherId: number, voucheeId: number): Promise<Vouch | undefined> {
+    const [vouch] = await db
+      .select()
+      .from(vouches)
+      .where(and(
+        eq(vouches.voucherId, voucherId),
+        eq(vouches.voucheeId, voucheeId),
+        eq(vouches.isActive, true)
+      ));
+    return vouch || undefined;
+  }
+
+  async createReview(insertReview: InsertReview): Promise<Review> {
+    const [review] = await db
+      .insert(reviews)
+      .values(insertReview)
+      .returning();
+    return review;
+  }
+
+  async getReviewsByUser(userId: number): Promise<Review[]> {
+    return await db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.reviewerId, userId))
+      .orderBy(desc(reviews.createdAt));
+  }
+
+  async getReviewsForUser(userId: number): Promise<Review[]> {
+    return await db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.revieweeId, userId))
+      .orderBy(desc(reviews.createdAt));
+  }
+
+  async createActivity(insertActivity: InsertActivity): Promise<Activity> {
+    const [activity] = await db
+      .insert(activities)
+      .values(insertActivity)
+      .returning();
+    return activity;
+  }
+
+  async getActivitiesByUser(userId: number, limit: number): Promise<Activity[]> {
+    return await db
+      .select()
+      .from(activities)
+      .where(eq(activities.userId, userId))
+      .orderBy(desc(activities.createdAt))
+      .limit(limit);
+  }
+
+  async createConnection(insertConnection: InsertConnection): Promise<Connection> {
+    const [connection] = await db
+      .insert(connections)
+      .values(insertConnection)
+      .returning();
+    return connection;
+  }
+
+  async getConnectionsByUser(userId: number): Promise<Connection[]> {
+    return await db
+      .select()
+      .from(connections)
+      .where(eq(connections.userId, userId));
+  }
+
+  async areUsersConnected(userId: number, connectedUserId: number): Promise<boolean> {
+    const [connection] = await db
+      .select()
+      .from(connections)
+      .where(and(
+        eq(connections.userId, userId),
+        eq(connections.connectedUserId, connectedUserId)
+      ));
+    return !!connection;
+  }
+}
+
+export const storage = new DatabaseStorage();
