@@ -10,13 +10,13 @@ export const users = pgTable("users", {
   pfpUrl: text("pfp_url"),
   bio: text("bio"),
   ethosAddress: text("ethos_address"),
-  credibilityScore: integer("credibility_score").default(0),
-  vouchesReceived: integer("vouches_received").default(0),
-  vouchesGiven: integer("vouches_given").default(0),
-  reviewsGiven: integer("reviews_given").default(0),
-  networkSize: integer("network_size").default(0),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  credibilityScore: integer("credibility_score").default(0).notNull(),
+  vouchesReceived: integer("vouches_received").default(0).notNull(),
+  vouchesGiven: integer("vouches_given").default(0).notNull(),
+  reviewsGiven: integer("reviews_given").default(0).notNull(),
+  networkSize: integer("network_size").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const vouches = pgTable("vouches", {
