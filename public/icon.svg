@@ -1,0 +1,17 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="64" fill="url(#grad1)"/>
+  <g fill="white">
+    <circle cx="128" cy="80" r="20" stroke="white" stroke-width="4" fill="none"/>
+    <path d="M128 110 L108 180 L148 180 Z" stroke="white" stroke-width="4" fill="none"/>
+    <circle cx="108" cy="190" r="8" fill="white"/>
+    <circle cx="148" cy="190" r="8" fill="white"/>
+    <path d="M80 140 L128 120 L176 140" stroke="white" stroke-width="4" fill="none"/>
+    <text x="128" y="230" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="white">ETHOS</text>
+  </g>
+</svg>

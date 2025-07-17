@@ -1,12 +1,12 @@
 {
   "version": "1",
   "name": "Ethos Network",
-  "iconUrl": "https://example.com/ethos-icon.png",
+  "iconUrl": "https://ethos-network.replit.app/icon.png",
   "homeUrl": "https://ethos-network.replit.app/",
-  "imageUrl": "https://example.com/ethos-preview.png",
+  "imageUrl": "https://ethos-network.replit.app/preview.png",
   "buttonTitle": "View Reputation",
   "description": "View credibility scores and manage your Web3 reputation on Ethos Network",
-  "splashImageUrl": "https://example.com/ethos-splash.png",
+  "splashImageUrl": "https://ethos-network.replit.app/splash.png",
   "splashBackgroundColor": "#8B5CF6",
   "webhookUrl": "https://ethos-network.replit.app/api/webhook"
 }

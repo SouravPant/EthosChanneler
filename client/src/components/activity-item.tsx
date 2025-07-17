@@ -45,9 +45,15 @@ export function ActivityItem({ activity, actor }: ActivityItemProps) {
     return "text-neutral";
   };
 
-  const formatTimeAgo = (date: Date) => {
+  const formatTimeAgo = (date: Date | string) => {
     const now = new Date();
-    const diff = now.getTime() - date.getTime();
+    const activityDate = typeof date === 'string' ? new Date(date) : date;
+    
+    if (isNaN(activityDate.getTime())) {
+      return "Unknown time";
+    }
+    
+    const diff = now.getTime() - activityDate.getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(hours / 24);
     

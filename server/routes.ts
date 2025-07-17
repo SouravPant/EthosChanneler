@@ -280,6 +280,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Farcaster Mini App webhook endpoint
+  app.post("/api/webhook", async (req, res) => {
+    try {
+      console.log("Received webhook:", req.body);
+      
+      // Handle Farcaster webhook events
+      const { type, data } = req.body;
+      
+      switch (type) {
+        case "frame_interaction":
+          // Handle frame interactions
+          break;
+        case "cast_mention":
+          // Handle cast mentions
+          break;
+        default:
+          console.log("Unknown webhook type:", type);
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Webhook error:", error);
+      res.status(500).json({ message: "Webhook processing failed" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
