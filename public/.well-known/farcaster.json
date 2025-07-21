@@ -14,7 +14,7 @@
     "splashBackgroundColor": "#667eea",
     "webhookUrl": "https://ethoschannel.netlify.app/api/webhook",
     "description": "A simple and elegant Farcaster Mini App that allows you to connect your account and view your profile information using the official Farcaster SDK.",
-    "subtitle": "Connect your Farcaster account for Ethos analysis",
+    "subtitle": "Connect for Ethos analysis",
     "primaryCategory": "social",
     "screenshotUrls": [
       "https://via.placeholder.com/400x800/667eea/ffffff?text=Ethos+Mapper+Screenshot"
