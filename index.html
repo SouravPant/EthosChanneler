@@ -3,130 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ethos Network - REAL API DEPLOYED</title>
+    <title>Ethos Network - Simple Search</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #0a0a0f;
             color: #ffffff;
-            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
             min-height: 100vh;
         }
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 2rem;
         }
-        .header {
+        h1 {
             text-align: center;
-            margin-bottom: 3rem;
-        }
-        .header h1 {
-            font-size: 3rem;
+            font-size: 2.5rem;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-        }
-        .search-section {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2rem;
-            border-radius: 16px;
             margin-bottom: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .search-container {
+        .search-box {
             display: flex;
             gap: 1rem;
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
         }
-        .search-input {
+        input {
             flex: 1;
-            padding: 1rem 1.5rem;
+            padding: 1rem;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
+            border-radius: 8px;
             color: white;
             font-size: 1rem;
         }
-        .search-input::placeholder { color: rgba(255, 255, 255, 0.5); }
-        .search-btn {
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        button {
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
             padding: 1rem 2rem;
             border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .search-btn:hover { transform: translateY(-2px); }
-        .search-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .examples {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-        }
-        .example-btn {
-            background: rgba(139, 92, 246, 0.2);
-            color: #8b5cf6;
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            padding: 0.5rem 1rem;
             border-radius: 8px;
             cursor: pointer;
+            font-weight: 600;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .examples {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .example {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            border-radius: 20px;
+            cursor: pointer;
             font-size: 0.9rem;
-            transition: all 0.3s ease;
         }
-        .example-btn:hover { background: rgba(139, 92, 246, 0.3); }
-        .results {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-top: 2rem;
-            display: none;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .results.active { display: block; }
-        .result-card {
+        .result {
             background: rgba(255, 255, 255, 0.1);
             padding: 2rem;
             border-radius: 12px;
-            margin-bottom: 1rem;
+            margin-top: 2rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .user-header {
+        .user-info {
             display: flex;
             align-items: center;
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
-        .user-avatar {
+        .avatar {
             width: 60px;
             height: 60px;
-            border-radius: 50%;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        }
-        .user-info h3 {
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 1.5rem;
-            margin-bottom: 0.5rem;
+            font-weight: bold;
         }
-        .user-info p {
-            color: rgba(255, 255, 255, 0.7);
-        }
-        .stats-grid {
+        .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 1rem;
-            margin-bottom: 1.5rem;
+            margin-top: 1rem;
         }
-        .stat-card {
+        .stat {
             background: rgba(99, 102, 241, 0.1);
             padding: 1rem;
             border-radius: 8px;
             text-align: center;
-            border: 1px solid rgba(99, 102, 241, 0.3);
         }
         .stat-value {
             font-size: 1.5rem;
@@ -138,359 +115,187 @@
             color: rgba(255, 255, 255, 0.7);
             margin-top: 0.25rem;
         }
-        .social-links {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        .social-tag {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 2px solid white;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
         .error {
             background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
             color: #ef4444;
             padding: 1rem;
             border-radius: 8px;
-            margin-top: 1rem;
+            text-align: center;
+            margin-top: 2rem;
         }
-        .success {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #10b981;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
+        .loading {
+            text-align: center;
+            margin-top: 2rem;
+            color: rgba(255, 255, 255, 0.7);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Ethos Network</h1>
-            <p>The decentralized reputation platform that connects credibility across the blockchain ecosystem. Connect your wallet to explore real Ethos data.</p>
+        <h1>Ethos Network Search</h1>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Enter wallet address, ENS, or @farcaster username...">
+            <button onclick="search()" id="searchBtn">Search</button>
         </div>
-
-                 <div class="search-section">
-            <h2 style="margin-bottom: 1.5rem; text-align: center; color: white;">Search Ethos Network</h2>
-            <div class="search-container">
-                <input 
-                    type="text" 
-                    class="search-input" 
-                    id="searchInput"
-                    placeholder="Search: @username, vitalik.eth, or 0x123..."
-                />
-                <button class="search-btn" id="searchBtn" onclick="searchEthos()">
-                    <span id="searchBtnText">🔍 Search</span>
-                </button>
-            </div>
-            
-            <div class="examples">
-                <span style="color: rgba(255, 255, 255, 0.6); margin-right: 1rem;">Try these:</span>
-                <button class="example-btn" onclick="searchExample('vitalik.eth')">vitalik.eth</button>
-                <button class="example-btn" onclick="searchExample('@dwr.eth')">@dwr.eth</button>
-                <button class="example-btn" onclick="searchExample('@balajis.eth')">@balajis.eth</button>
-                <button class="example-btn" onclick="searchExample('0x742d35Cc6634C0532925a3b8D4b9F9C6B0C7D8E8')">Sample Address</button>
-            </div>
+        
+        <div class="examples">
+            <span onclick="searchExample('vitalik.eth')" class="example">vitalik.eth</span>
+            <span onclick="searchExample('@dwr.eth')" class="example">@dwr.eth</span>
+            <span onclick="searchExample('@balajis.eth')" class="example">@balajis.eth</span>
         </div>
-
-        <div class="results" id="results">
-            <!-- Results will be populated here -->
-        </div>
+        
+        <div id="results"></div>
     </div>
 
     <script>
-        const ETHOS_API_BASE = 'https://api.ethos.network/api/v2';
+        const API_BASE = 'https://api.ethos.network/api/v2';
 
-        // Search example function
-        function searchExample(example) {
-            document.getElementById('searchInput').value = example;
-            searchEthos();
+        function searchExample(term) {
+            document.getElementById('searchInput').value = term;
+            search();
         }
 
-        // Main search function
-        async function searchEthos() {
-            const searchInput = document.getElementById('searchInput');
-            const searchBtn = document.getElementById('searchBtn');
-            const searchBtnText = document.getElementById('searchBtnText');
+        async function search() {
+            const input = document.getElementById('searchInput');
+            const button = document.getElementById('searchBtn');
             const results = document.getElementById('results');
-            const query = searchInput.value.trim();
+            const query = input.value.trim();
 
             if (!query) {
                 showError('Please enter a search term');
                 return;
             }
 
-            // Update UI for loading state
-            searchBtn.disabled = true;
-            searchBtnText.innerHTML = '<div class="loading"></div> Searching...';
-            results.classList.add('active');
-            results.innerHTML = '<div style="text-align: center; padding: 2rem;"><div class="loading"></div><p style="margin-top: 1rem;">Searching Ethos Network...</p></div>';
+            button.disabled = true;
+            button.textContent = 'Searching...';
+            results.innerHTML = '<div class="loading">Searching Ethos Network...</div>';
 
             try {
-                let userData = null;
-                let searchType = '';
-                let searchEndpoint = '';
+                let user = null;
+                let endpoint = '';
 
-                // Determine search type and endpoint
+                // Determine search type
                 if (query.startsWith('0x') && query.length === 42) {
-                    // Ethereum address
-                    searchType = 'Ethereum Address';
-                    searchEndpoint = `${ETHOS_API_BASE}/user/by/address/${query}`;
-                } else if (query.endsWith('.eth') || query.endsWith('.ens')) {
-                    // ENS name
-                    searchType = 'ENS Domain';
-                    searchEndpoint = `${ETHOS_API_BASE}/user/by/username/${query}`;
+                    endpoint = `${API_BASE}/user/by/address/${query}`;
+                } else if (query.endsWith('.eth')) {
+                    endpoint = `${API_BASE}/user/by/username/${query}`;
                 } else if (query.startsWith('@')) {
-                    // Farcaster username (with @)
-                    searchType = 'Farcaster Username';
-                    const username = query.slice(1); // Remove @
-                    searchEndpoint = `${ETHOS_API_BASE}/user/by/farcaster/username/${username}`;
-                } else if (query.includes('.') && !query.includes(' ')) {
-                    // Likely a domain or username with extension
-                    searchType = 'Username/Domain';
-                    searchEndpoint = `${ETHOS_API_BASE}/user/by/username/${query}`;
+                    endpoint = `${API_BASE}/user/by/farcaster/username/${query.slice(1)}`;
                 } else {
-                    // Try Farcaster first, then general search
-                    searchType = 'Farcaster/General Search';
-                    searchEndpoint = `${ETHOS_API_BASE}/user/by/farcaster/username/${query}`;
+                    endpoint = `${API_BASE}/user/by/farcaster/username/${query}`;
                 }
 
-                console.log(`🔍 Searching ${searchType}: ${query}`);
-                console.log(`📡 Endpoint: ${searchEndpoint}`);
+                console.log('Searching:', endpoint);
 
-                const response = await fetch(searchEndpoint);
+                const response = await fetch(endpoint);
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('🔍 Search response:', data);
-                    
-                    if (data && (data.address || data.id || data.userKey)) {
-                        // Get additional data
-                        await enrichUserData(data);
-                        displaySearchResults([data]);
-                    } else {
-                        throw new Error(`${searchType} "${query}" not found in Ethos Network`);
-                    }
-                } else {
-                    // Try alternative search methods
-                    if (!query.startsWith('0x') && !query.endsWith('.eth') && searchType === 'Farcaster/General Search') {
-                        try {
-                            // Try general user search
-                            const generalSearch = await fetch(`${ETHOS_API_BASE}/users/search?query=${encodeURIComponent(query)}`);
-                            if (generalSearch.ok) {
-                                const generalData = await generalSearch.json();
-                                if (generalData && generalData.length > 0) {
-                                    // Enrich first result
-                                    await enrichUserData(generalData[0]);
-                                    displaySearchResults(generalData.slice(0, 3)); // Show top 3 results
-                                    return;
-                                }
-                            }
-                        } catch (e) {
-                            console.log('General search also failed:', e);
-                        }
-                    }
-                    throw new Error(`${searchType} "${query}" not found in Ethos Network`);
+                if (!response.ok) {
+                    throw new Error('User not found in Ethos Network');
                 }
+
+                user = await response.json();
+                
+                if (!user || (!user.address && !user.id && !user.userKey)) {
+                    throw new Error('User not found in Ethos Network');
+                }
+
+                // Get additional data
+                await enrichUser(user);
+                displayUser(user);
 
             } catch (error) {
-                console.error('Search error:', error);
-                displaySearchError(query, error.message);
+                showError(error.message);
             } finally {
-                // Reset button state
-                searchBtn.disabled = false;
-                searchBtnText.innerHTML = '🔍 Search';
+                button.disabled = false;
+                button.textContent = 'Search';
             }
         }
 
-        // Enrich user data with additional API calls
-        async function enrichUserData(user) {
+        async function enrichUser(user) {
             try {
-                // Get credibility score if we have address
+                // Get credibility score
                 if (user.address) {
-                    try {
-                        const scoreResponse = await fetch(`${ETHOS_API_BASE}/score/address?address=${user.address}`);
-                        if (scoreResponse.ok) {
-                            const scoreData = await scoreResponse.json();
-                            user.credibilityScore = scoreData.score || 0;
-                        }
-                    } catch (e) {
-                        console.log('Score fetch failed:', e);
+                    const scoreResponse = await fetch(`${API_BASE}/score/address?address=${user.address}`);
+                    if (scoreResponse.ok) {
+                        const scoreData = await scoreResponse.json();
+                        user.credibilityScore = scoreData.score || 0;
                     }
                 }
 
-                // Get XP data if we have userKey
+                // Get XP score
                 if (user.userKey) {
-                    try {
-                        const xpResponse = await fetch(`${ETHOS_API_BASE}/xp/user/${user.userKey}`);
-                        if (xpResponse.ok) {
-                            const xpData = await xpResponse.json();
-                            user.xpScore = xpData.totalXP || 0;
-                        }
-                    } catch (e) {
-                        console.log('XP fetch failed:', e);
+                    const xpResponse = await fetch(`${API_BASE}/xp/user/${user.userKey}`);
+                    if (xpResponse.ok) {
+                        const xpData = await xpResponse.json();
+                        user.xpScore = xpData.totalXP || 0;
                     }
                 }
-
             } catch (error) {
                 console.log('Error enriching user data:', error);
             }
         }
 
-        // Display search results
-        function displaySearchResults(users) {
+        function displayUser(user) {
             const results = document.getElementById('results');
-            
-            if (!users || users.length === 0) {
-                displaySearchError('', 'No users found');
-                return;
-            }
-
-            const resultsHTML = users.map(user => {
-                const displayName = user.displayName || user.name || user.username || user.farcasterUsername || 'Anonymous User';
-                const shortAddress = user.address ? `${user.address.slice(0, 6)}...${user.address.slice(-4)}` : 'No address';
-                const credibilityScore = user.credibilityScore || 0;
-                const xpScore = user.xpScore || 0;
-                const reviewCount = user.reviewCount || 0;
-                const vouchCount = user.vouchCount || 0;
-
-                let socialLinks = [];
-                if (user.farcasterUsername) socialLinks.push(`🟣 @${user.farcasterUsername}`);
-                if (user.twitterUsername) socialLinks.push(`🐦 @${user.twitterUsername}`);
-                if (user.discordUsername) socialLinks.push(`💬 ${user.discordUsername}`);
-                if (user.telegramUsername) socialLinks.push(`📱 @${user.telegramUsername}`);
-
-                return `
-                    <div class="result-card">
-                        <div class="user-header">
-                            <div class="user-avatar"></div>
-                            <div class="user-info">
-                                <h3>${displayName}</h3>
-                                <p>${shortAddress}</p>
-                                ${user.bio ? `<p style="margin-top: 0.5rem; font-style: italic;">${user.bio}</p>` : ''}
-                            </div>
-                        </div>
-                        
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-value">${credibilityScore}</div>
-                                <div class="stat-label">Credibility Score</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">${xpScore}</div>
-                                <div class="stat-label">XP Score</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">${reviewCount}</div>
-                                <div class="stat-label">Reviews</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">${vouchCount}</div>
-                                <div class="stat-label">Vouches</div>
-                            </div>
-                        </div>
-                        
-                        ${socialLinks.length > 0 ? `
-                            <div class="social-links">
-                                ${socialLinks.map(link => `<span class="social-tag">${link}</span>`).join('')}
-                            </div>
-                        ` : ''}
-                        
-                        ${user.userKey ? `
-                            <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                                <small style="color: rgba(255,255,255,0.6);">User Key: ${user.userKey}</small>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }).join('');
+            const name = user.displayName || user.name || user.username || user.farcasterUsername || 'User';
+            const address = user.address ? `${user.address.slice(0, 6)}...${user.address.slice(-4)}` : 'No address';
+            const score = user.credibilityScore || 0;
+            const xp = user.xpScore || 0;
+            const reviews = user.reviewCount || 0;
+            const vouches = user.vouchCount || 0;
 
             results.innerHTML = `
-                <h2 style="margin-bottom: 1.5rem; color: white;">Search Results (${users.length})</h2>
-                ${resultsHTML}
-                <div style="text-align: center; margin-top: 2rem;">
-                    <button class="search-btn" onclick="document.getElementById('results').classList.remove('active')">
-                        ✕ Close Results
-                    </button>
+                <div class="result">
+                    <div class="user-info">
+                        <div class="avatar">${name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <h2>${name}</h2>
+                            <p style="color: rgba(255, 255, 255, 0.7);">${address}</p>
+                            ${user.bio ? `<p style="margin-top: 0.5rem; font-style: italic;">${user.bio}</p>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="stats">
+                        <div class="stat">
+                            <div class="stat-value">${score}</div>
+                            <div class="stat-label">Credibility Score</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">${xp}</div>
+                            <div class="stat-label">XP Score</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">${reviews}</div>
+                            <div class="stat-label">Reviews</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">${vouches}</div>
+                            <div class="stat-label">Vouches</div>
+                        </div>
+                    </div>
+                    
+                    ${user.farcasterUsername ? `<p style="margin-top: 1rem;"><strong>Farcaster:</strong> @${user.farcasterUsername}</p>` : ''}
+                    ${user.twitterUsername ? `<p><strong>Twitter:</strong> @${user.twitterUsername}</p>` : ''}
+                    ${user.userKey ? `<p style="margin-top: 1rem; font-size: 0.8rem; color: rgba(255,255,255,0.5);">User Key: ${user.userKey}</p>` : ''}
                 </div>
             `;
         }
 
-        // Display search error
-        function displaySearchError(query, errorMessage) {
-            const results = document.getElementById('results');
-            
-            let suggestions = '';
-            if (query.startsWith('0x')) {
-                suggestions = `
-                    <p style="margin-top: 1rem; color: rgba(255, 255, 255, 0.6);">This wallet address isn't registered on Ethos Network yet.</p>
-                    <p style="color: rgba(255, 255, 255, 0.6);">Try searching for verified users:</p>
-                `;
-            } else {
-                suggestions = `
-                    <p style="margin-top: 1rem; color: rgba(255, 255, 255, 0.6);">Try these search formats:</p>
-                `;
-            }
-
-            results.innerHTML = `
-                <div style="text-align: center; padding: 2rem;">
-                    <div class="error">
-                        <h3 style="margin-bottom: 1rem;">❌ ${errorMessage}</h3>
-                        ${suggestions}
-                        <div style="margin: 1.5rem 0; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;">
-                            <button class="example-btn" onclick="searchExample('vitalik.eth')">vitalik.eth</button>
-                            <button class="example-btn" onclick="searchExample('@dwr.eth')">@dwr.eth</button>
-                            <button class="example-btn" onclick="searchExample('@balajis.eth')">@balajis.eth</button>
-                        </div>
-                        <button class="search-btn" onclick="document.getElementById('results').classList.remove('active')" style="margin-top: 1rem;">
-                            ✕ Close
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Show error message
         function showError(message) {
-            const results = document.getElementById('results');
-            results.classList.add('active');
-            results.innerHTML = `
+            document.getElementById('results').innerHTML = `
                 <div class="error">
-                    <h3>⚠️ ${message}</h3>
+                    <h3>❌ ${message}</h3>
+                    <p>Try searching for: vitalik.eth, @dwr.eth, or @balajis.eth</p>
                 </div>
             `;
-            setTimeout(() => {
-                results.classList.remove('active');
-            }, 3000);
         }
 
-        // Search on Enter key
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    searchEthos();
-                }
-            });
+        // Enter key support
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                search();
+            }
         });
     </script>
 </body>
