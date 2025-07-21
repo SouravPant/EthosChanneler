@@ -1,5 +1,5 @@
 // Official Farcaster Mini App SDK Integration
-// Following https://miniapps.farcaster.xyz/docs/sdk/
+// Following latest https://miniapps.farcaster.xyz/docs/sdk/ patterns
 
 class FarcasterSDK {
     constructor() {
@@ -7,14 +7,21 @@ class FarcasterSDK {
         this.context = null;
         this.user = null;
         this.capabilities = {
-            quickAuth: false,
-            actions: false,
-            wallet: false,
-            haptics: false,
-            backNavigation: false
+            quickAuth: true,        // ✅ Supported
+            actions: {
+                swapToken: false,   // ❌ Not yet supported on Base (ETA 1-2 weeks)
+                sendToken: false    // ❌ Not yet supported on Base (ETA 1-2 weeks)
+            },
+            wallet: {
+                getEthereumProvider: false  // ❌ Not yet supported on Base (ETA 1-2 weeks)
+            },
+            haptics: true,          // ✅ Supported
+            backNavigation: true,   // ✅ Supported
+            events: true,           // ✅ Supported
+            miniAppDetection: true  // ✅ Supported
         };
         
-        console.log('🚀 Initializing Official Farcaster SDK');
+        console.log('🚀 Initializing Official Farcaster SDK v2024');
         this.init();
     }
 
@@ -97,24 +104,32 @@ class FarcasterSDK {
     }
 
     async checkCapabilities() {
-        // Check what's supported based on compatibility matrix
+        // Check what's supported based on latest compatibility matrix
         try {
-            // Quick Auth - supported
+            // Quick Auth - ✅ Supported
             this.capabilities.quickAuth = typeof window.farcaster?.quickAuth !== 'undefined';
             
-            // Actions - ETA 1-2 weeks (as of compatibility page)
-            this.capabilities.actions = false; // Not yet supported
+            // Actions - ❌ ETA 1-2 weeks (swapToken, sendToken not yet on Base)
+            this.capabilities.actions.swapToken = false; // Not yet supported on Base
+            this.capabilities.actions.sendToken = false; // Not yet supported on Base
             
-            // Wallet - ETA 1-2 weeks
-            this.capabilities.wallet = false; // Not yet supported
+            // Wallet - ❌ ETA 1-2 weeks (getEthereumProvider not yet on Base)
+            this.capabilities.wallet.getEthereumProvider = false; // Not yet supported on Base
             
-            // Haptics - supported
+            // Haptics - ✅ Supported
             this.capabilities.haptics = typeof window.farcaster?.haptics !== 'undefined';
             
-            // Back Navigation - supported
+            // Back Navigation - ✅ Supported
             this.capabilities.backNavigation = typeof window.farcaster?.back !== 'undefined';
             
-            console.log('📋 SDK Capabilities:', this.capabilities);
+            // Events - ✅ Supported
+            this.capabilities.events = typeof window.farcaster?.addEventListener !== 'undefined';
+            
+            // Mini App Detection - ✅ Supported
+            this.capabilities.miniAppDetection = typeof window.farcaster !== 'undefined';
+            
+            console.log('📋 SDK Capabilities (Updated 2024):', this.capabilities);
+            console.log('⚠️ Note: Actions and Wallet features ETA 1-2 weeks on Base');
         } catch (error) {
             console.warn('⚠️ Error checking capabilities:', error);
         }
@@ -206,18 +221,26 @@ class FarcasterSDK {
                 throw new Error('Quick Auth not supported');
             }
 
-            console.log('🔐 Starting Quick Auth flow');
+            console.log('🔐 Starting Quick Auth flow (2024 SDK)');
             
-            // Note: Based on compatibility matrix, this may have limitations on Base
-            // Handle dismissal gracefully
+            // Note: getToken() cannot be retriggered if user dismisses on Base
+            // This is a known limitation mentioned in the compatibility docs
             
-            const token = await window.farcaster.quickAuth.getToken();
-            if (token) {
-                // Verify token and get user data
-                const userData = await this.verifyToken(token);
-                this.user = userData;
-                this.onUserAvailable(userData);
-                return userData;
+            try {
+                const token = await window.farcaster.quickAuth.getToken();
+                if (token) {
+                    // Verify token and get user data
+                    const userData = await this.verifyToken(token);
+                    this.user = userData;
+                    this.onUserAvailable(userData);
+                    return userData;
+                }
+            } catch (authError) {
+                if (authError.message.includes('dismissed') || authError.message.includes('cancelled')) {
+                    console.warn('⚠️ User dismissed auth - cannot retrigger on Base');
+                    throw new Error('Authentication dismissed by user. Please refresh to try again.');
+                }
+                throw authError;
             }
             
             throw new Error('Authentication cancelled or failed');

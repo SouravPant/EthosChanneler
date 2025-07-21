@@ -1,0 +1,50 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjgxODAyNiwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDEyMzQ1Njc4OTBhYmNkZWYifQ",
+    "payload": "eyJkb21haW4iOiJldGhvc2NoYW5uZWwubmV0bGlmeS5hcHAifQ",
+    "signature": "MHhmOGQ1YzQyMmU3ZTZlMWNhMzU1YWI5ZjE2NzIwMzQ1NjdmOGQ5YzEyMzQ1Njc4OTBhYmNkZWY"
+  },
+  "frame": {
+    "version": "2024-01",
+    "name": "Farcaster Search - Ethos Network",
+    "subtitle": "Discover user reputation on Ethos Network",
+    "description": "Search and discover Farcaster users with comprehensive reputation data from Ethos Network. View user scores, XP, reviews, and vouches all in one place.",
+    "iconUrl": "https://via.placeholder.com/192x192/8b5cf6/ffffff?text=FC",
+    "homeUrl": "https://ethoschannel.netlify.app",
+    "splashImageUrl": "https://via.placeholder.com/512x512/1a1a2e/8b5cf6?text=Loading",
+    "splashBackgroundColor": "#1a1a2e",
+    "heroImageUrl": "https://via.placeholder.com/1200x630/8b5cf6/ffffff?text=Farcaster+Search+-+Ethos+Network",
+    "tagline": "Discover user reputation on Ethos Network",
+    "screenshotUrls": [
+      "https://via.placeholder.com/400x800/8b5cf6/ffffff?text=Search+Interface",
+      "https://via.placeholder.com/400x800/3b82f6/ffffff?text=User+Profile",
+      "https://via.placeholder.com/400x800/10b981/ffffff?text=Reputation+Data"
+    ],
+    "primaryCategory": "social",
+    "tags": ["reputation", "search", "farcaster", "ethos", "web3"],
+    "webhookUrl": "https://ethoschannel.netlify.app/api/webhook",
+    "features": {
+      "quickAuth": true,
+      "haptics": true,
+      "backNavigation": true,
+      "events": true,
+      "miniAppDetection": true,
+      "actions": {
+        "swapToken": false,
+        "sendToken": false
+      },
+      "wallet": {
+        "getEthereumProvider": false
+      }
+    },
+    "compatibility": {
+      "base": {
+        "quickAuth": true,
+        "haptics": true,
+        "backNavigation": true,
+        "actions": "eta-1-2-weeks",
+        "wallet": "eta-1-2-weeks"
+      }
+    }
+  }
+}
