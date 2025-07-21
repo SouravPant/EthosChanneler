@@ -3,20 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ethos Network - DEPLOY NOW</title>
-    <!-- FORCED DEPLOYMENT: 2024-01-21 06:50 UTC -->
+    <title>Ethos Network - ETHERS FIXED</title>
+    <!-- ETHERS.JS MULTI-CDN FIX: 2024-01-21 06:55 UTC -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
-    <!-- Web3 Integration -->
+    <!-- Web3 Integration - Multiple CDNs for reliability -->
     <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script>
-        // Ensure ethers is available globally
-        if (typeof ethers === 'undefined') {
-            console.error('Ethers.js failed to load');
-        } else {
-            console.log('✅ Ethers.js loaded successfully');
-        }
+        // Ensure ethers is available globally with fallback
+        window.addEventListener('load', function() {
+            if (typeof ethers === 'undefined') {
+                console.error('⚠️ Ethers.js failed to load from primary CDN');
+                // Try loading from alternative CDN
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js';
+                script.onload = function() {
+                    console.log('✅ Ethers.js loaded from fallback CDN');
+                };
+                script.onerror = function() {
+                    console.error('❌ All ethers.js CDNs failed');
+                    alert('Web3 library failed to load. Please refresh the page.');
+                };
+                document.head.appendChild(script);
+            } else {
+                console.log('✅ Ethers.js loaded successfully');
+            }
+        });
     </script>
     
     <!-- Farcaster Frame Meta Tags -->
