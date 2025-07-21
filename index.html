@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ethos Network - Web3 Reputation Platform FINAL</title>
+    <title>Ethos Network - Web3 Reputation Platform WORKING</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
@@ -548,7 +548,7 @@
                         </button>
                     </div>
                     <div style="margin-top: 1rem; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">
-                        Try: <code style="background: rgba(255,255,255,0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">0x742d35Cc...</code> or <code style="background: rgba(255,255,255,0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">@vitalik.eth</code>
+                        Try: <code style="background: rgba(255,255,255,0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">vitalik.eth</code> or <code style="background: rgba(255,255,255,0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">@dwr.eth</code>
                     </div>
                 </div>
                 
@@ -880,8 +880,13 @@
             if (!users || users.length === 0) {
                 searchResults.innerHTML = `
                     <div style="text-align: center; padding: 2rem;">
-                        <h3 style="color: #f59e0b; margin-bottom: 1rem;">No Results Found</h3>
-                        <p style="color: rgba(255, 255, 255, 0.7);">Try searching with a different address or username.</p>
+                        <h3 style="color: #f59e0b; margin-bottom: 1rem;">User Not Found in Ethos Network</h3>
+                        <p style="color: rgba(255, 255, 255, 0.7);">This user isn't registered on Ethos Network yet.</p>
+                        <p style="color: rgba(255, 255, 255, 0.5); margin-top: 1rem;">Try searching for:</p>
+                        <div style="margin: 1rem 0;">
+                            <code style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 4px; margin: 0.5rem;">vitalik.eth</code>
+                            <code style="background: rgba(255,255,255,0.1); padding: 0.5rem; border-radius: 4px; margin: 0.5rem;">@dwr.eth</code>
+                        </div>
                         <button class="btn-secondary" onclick="document.getElementById('searchResults').classList.remove('active')" style="margin-top: 1rem;">
                             Close
                         </button>
