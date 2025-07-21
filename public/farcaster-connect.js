@@ -89,10 +89,25 @@ const EthosMapper = {
                 console.warn('⚠️ API error:', error);
             }
             
-            // If no API data, create mock data for demo
+            // If no API data, show not found message
             if (!profileData) {
-                console.log('📝 Creating demo data for:', username);
-                profileData = this.createDemoData(username);
+                console.log('❌ No profile data found for:', username);
+                profileData = {
+                    username: username,
+                    ethosScore: 0,
+                    credibilityScore: 0,
+                    reviews: 0,
+                    vouches: 0,
+                    attestations: 0,
+                    reputation: 'Not Found',
+                    trustLevel: 'No Data',
+                    profileUrl: `https://ethos.network/profile/${username}`,
+                    lastUpdated: new Date().toISOString(),
+                    source: 'ethos_api',
+                    description: 'No Ethos Network profile found for this username',
+                    displayPercentage: 0,
+                    xpTotal: 0
+                };
             }
             
             this.searchResults = profileData;
@@ -110,7 +125,23 @@ const EthosMapper = {
                 await this.sdk.haptics.error();
             }
             
-            this.searchResults = this.createDemoData(username);
+            // Show error state instead of demo data
+            this.searchResults = {
+                username: username,
+                ethosScore: 0,
+                credibilityScore: 0,
+                reviews: 0,
+                vouches: 0,
+                attestations: 0,
+                reputation: 'Error Loading',
+                trustLevel: 'No Data',
+                profileUrl: `https://ethos.network/profile/${username}`,
+                lastUpdated: new Date().toISOString(),
+                source: 'ethos_api',
+                description: 'Error loading Ethos Network data',
+                displayPercentage: 0,
+                xpTotal: 0
+            };
         } finally {
             this.isLoading = false;
             this.render();
@@ -679,7 +710,7 @@ const EthosMapper = {
                     <h3>🏆 Reputation: ${data.reputation}</h3>
                     ${data.description ? `<p>${data.description}</p>` : ''}
                     ${data.xpTotal ? `<p><strong>Total XP:</strong> ${data.xpTotal.toLocaleString()}</p>` : ''}
-                    <p><small>Data source: ${data.source === 'ethos_api' ? 'Live Ethos Network API' : 'Demo Data'}</small></p>
+                    <p><small>Data source: Live Ethos Network API</small></p>
                 </div>
                 
                 <div class="action-buttons">
