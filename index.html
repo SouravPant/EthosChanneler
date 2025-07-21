@@ -5,25 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ethos API Test</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; }
-        button { padding: 10px 20px; background: #007cba; color: white; border: none; cursor: pointer; }
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .search-section { margin: 30px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .search-section h3 { margin-top: 0; color: #333; }
+        input { width: calc(100% - 120px); padding: 10px; margin: 10px 0; border: 1px solid #ccc; }
+        button { padding: 10px 20px; background: #007cba; color: white; border: none; cursor: pointer; margin-left: 10px; }
         .result { margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 5px; }
         .error { background: #ffe6e6; color: #cc0000; }
+        .success { background: #e6ffe6; color: #006600; }
     </style>
 </head>
 <body>
     <h1>Ethos Network API Test</h1>
     
-    <input type="text" id="searchInput" placeholder="Enter wallet address (0x...)">
-    <button onclick="search()">Search</button>
-    
-    <div id="result"></div>
+    <!-- Wallet Address Search -->
+    <div class="search-section">
+        <h3>🔸 Search by Wallet Address</h3>
+        <input type="text" id="walletInput" placeholder="Enter wallet address (0x...)">
+        <button onclick="searchWallet()">Search Wallet</button>
+        <div id="walletResult"></div>
+    </div>
+
+    <!-- Farcaster Username Search -->
+    <div class="search-section">
+        <h3>🟣 Search by Farcaster Username</h3>
+        <input type="text" id="farcasterInput" placeholder="Enter farcaster username (without @)">
+        <button onclick="searchFarcaster()">Search Farcaster</button>
+        <div id="farcasterResult"></div>
+    </div>
+
+    <!-- Twitter Username Search -->
+    <div class="search-section">
+        <h3>🐦 Search by Twitter Username</h3>
+        <input type="text" id="twitterInput" placeholder="Enter twitter username (without @)">
+        <button onclick="searchTwitter()">Search Twitter</button>
+        <div id="twitterResult"></div>
+    </div>
 
     <script>
-        async function search() {
-            const input = document.getElementById('searchInput').value.trim();
-            const result = document.getElementById('result');
+        // Wallet Address Search
+        async function searchWallet() {
+            const input = document.getElementById('walletInput').value.trim();
+            const result = document.getElementById('walletResult');
             
             if (!input) {
                 result.innerHTML = '<div class="error">Please enter a wallet address</div>';
@@ -35,47 +58,151 @@
                 return;
             }
 
-            result.innerHTML = 'Searching...';
+            result.innerHTML = 'Searching wallet...';
 
             try {
                 const url = `https://api.ethos.network/api/v2/user/by/address/${input}`;
-
-                console.log('API URL:', url);
+                console.log('Wallet API URL:', url);
                 
                 const response = await fetch(url);
                 const data = await response.json();
                 
-                console.log('API Response:', data);
+                console.log('Wallet API Response:', data);
                 
                 if (response.ok && data) {
                     result.innerHTML = `
-                        <div class="result">
-                            <h3>✅ Found User</h3>
+                        <div class="result success">
+                            <h4>✅ Found User by Wallet</h4>
                             <pre>${JSON.stringify(data, null, 2)}</pre>
                         </div>
                     `;
                 } else {
                     result.innerHTML = `
                         <div class="result error">
-                            <h3>❌ Not Found</h3>
-                            <p>No user found for: ${input}</p>
+                            <h4>❌ Wallet Not Found</h4>
+                            <p>No user found for wallet: ${input}</p>
                         </div>
                     `;
                 }
                 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Wallet Error:', error);
                 result.innerHTML = `
                     <div class="result error">
-                        <h3>❌ Error</h3>
+                        <h4>❌ Wallet Search Error</h4>
                         <p>${error.message}</p>
                     </div>
                 `;
             }
         }
 
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') search();
+        // Farcaster Username Search
+        async function searchFarcaster() {
+            const input = document.getElementById('farcasterInput').value.trim();
+            const result = document.getElementById('farcasterResult');
+            
+            if (!input) {
+                result.innerHTML = '<div class="error">Please enter a farcaster username</div>';
+                return;
+            }
+
+            result.innerHTML = 'Searching farcaster...';
+
+            try {
+                const url = `https://api.ethos.network/api/v2/user/by/farcaster/username/${input}`;
+                console.log('Farcaster API URL:', url);
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                console.log('Farcaster API Response:', data);
+                
+                if (response.ok && data) {
+                    result.innerHTML = `
+                        <div class="result success">
+                            <h4>✅ Found User by Farcaster</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="result error">
+                            <h4>❌ Farcaster Not Found</h4>
+                            <p>No user found for farcaster username: ${input}</p>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Farcaster Error:', error);
+                result.innerHTML = `
+                    <div class="result error">
+                        <h4>❌ Farcaster Search Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Twitter Username Search
+        async function searchTwitter() {
+            const input = document.getElementById('twitterInput').value.trim();
+            const result = document.getElementById('twitterResult');
+            
+            if (!input) {
+                result.innerHTML = '<div class="error">Please enter a twitter username</div>';
+                return;
+            }
+
+            result.innerHTML = 'Searching twitter...';
+
+            try {
+                const url = `https://api.ethos.network/api/v2/user/by/twitter/username/${input}`;
+                console.log('Twitter API URL:', url);
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                console.log('Twitter API Response:', data);
+                
+                if (response.ok && data) {
+                    result.innerHTML = `
+                        <div class="result success">
+                            <h4>✅ Found User by Twitter</h4>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="result error">
+                            <h4>❌ Twitter Not Found</h4>
+                            <p>No user found for twitter username: ${input}</p>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Twitter Error:', error);
+                result.innerHTML = `
+                    <div class="result error">
+                        <h4>❌ Twitter Search Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Enter key support for all inputs
+        document.getElementById('walletInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchWallet();
+        });
+        
+        document.getElementById('farcasterInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchFarcaster();
+        });
+        
+        document.getElementById('twitterInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchTwitter();
         });
     </script>
 </body>
