@@ -56,31 +56,37 @@ const EthosMapper = {
         try {
             console.log('🔍 Searching Ethos profile for:', username);
             
-            // Try multiple API endpoints for Ethos Network
+            // Try Ethos Network API endpoints
             const endpoints = [
                 `https://api.ethos.network/api/v2/user/by/farcaster/username/${username}`,
-                `https://api.ethos.network/v2/user/by/farcaster/${username}`,
-                `https://ethos.network/api/user/farcaster/${username}`
+                `https://api.ethos.network/api/v2/users/by/farcaster`,
+                `https://api.ethos.network/api/v2/score/userkey`
             ];
             
             let profileData = null;
             
-            for (const endpoint of endpoints) {
-                try {
-                    console.log('📡 Trying endpoint:', endpoint);
-                    const response = await fetch(endpoint);
+            // Try the primary Farcaster username endpoint
+            try {
+                console.log('📡 Trying primary endpoint for username:', username);
+                const response = await fetch(`https://api.ethos.network/api/v2/user/by/farcaster/username/${username}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Ethos API response:', data);
                     
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log('✅ Ethos API response:', data);
-                        profileData = this.processEthosData(data, username);
-                        break;
+                    if (data && (data.id || data.userkey)) {
+                        // Get additional score data
+                        const userKey = data.userkey || data.id;
+                        const scoreData = await this.getEthosScore(userKey);
+                        profileData = this.processEthosData({...data, ...scoreData}, username);
                     } else {
-                        console.warn('⚠️ Endpoint failed:', endpoint, response.status);
+                        console.warn('⚠️ No user data found for:', username);
                     }
-                } catch (error) {
-                    console.warn('⚠️ Endpoint error:', endpoint, error);
+                } else {
+                    console.warn('⚠️ API failed:', response.status, await response.text());
                 }
+            } catch (error) {
+                console.warn('⚠️ API error:', error);
             }
             
             // If no API data, create mock data for demo
@@ -113,20 +119,81 @@ const EthosMapper = {
         return this.searchResults;
     },
 
+    async getEthosScore(userKey) {
+        if (!userKey) return {};
+        
+        try {
+            console.log('📊 Fetching score for userKey:', userKey);
+            const response = await fetch(`https://api.ethos.network/api/v2/score/userkey?userkey=${userKey}`);
+            
+            if (response.ok) {
+                const scoreData = await response.json();
+                console.log('📊 Score data:', scoreData);
+                return scoreData;
+            } else {
+                console.warn('⚠️ Score API failed:', response.status);
+            }
+        } catch (error) {
+            console.warn('⚠️ Score API error:', error);
+        }
+        
+        return {};
+    },
+
     processEthosData(data, username) {
         // Process real Ethos API response
+        console.log('🔄 Processing Ethos data:', data);
+        
+        // Extract data from the API response structure
+        const user = data.user || data;
+        const rawScore = user.score || data.score || 0;
+        const xpTotal = user.xpTotal || data.xpTotal || 0;
+        const stats = user.stats || {};
+        
+        // Convert Ethos score (0-5000+) to percentage (0-100)
+        const normalizedScore = Math.min(Math.round((rawScore / 50)), 100);
+        
+        // Extract review and vouch data
+        const reviewStats = stats.review?.received || {};
+        const vouchStats = stats.vouch?.received || {};
+        
+        const positiveReviews = reviewStats.positive || 0;
+        const neutralReviews = reviewStats.neutral || 0;
+        const negativeReviews = reviewStats.negative || 0;
+        const totalReviews = positiveReviews + neutralReviews + negativeReviews;
+        
+        const vouchCount = vouchStats.count || 0;
+        const vouchAmount = vouchStats.amountWeiTotal || '0';
+        
+        // Calculate credibility based on reviews
+        const credibilityScore = totalReviews > 0 ? 
+            Math.round((positiveReviews / totalReviews) * 100) : 
+            normalizedScore;
+        
+        // Calculate reputation based on normalized score
+        let reputation = 'Unknown';
+        if (normalizedScore >= 90) reputation = 'Exceptional';
+        else if (normalizedScore >= 80) reputation = 'Highly Trusted';
+        else if (normalizedScore >= 70) reputation = 'Trusted';
+        else if (normalizedScore >= 60) reputation = 'Reliable';
+        else if (normalizedScore >= 40) reputation = 'Developing';
+        else if (normalizedScore > 0) reputation = 'New User';
+        
         return {
             username: username,
-            ethosScore: data.score || data.ethos_score || 0,
-            credibilityScore: data.credibility || data.credibility_score || 0,
-            reviews: data.reviews || data.review_count || 0,
-            vouches: data.vouches || data.vouch_count || 0,
-            attestations: data.attestations || data.attestation_count || 0,
-            reputation: data.reputation || 'Unknown',
-            trustLevel: this.calculateTrustLevel(data.score || 0),
-            profileUrl: `https://ethos.network/profile/${username}`,
+            ethosScore: normalizedScore,
+            credibilityScore: credibilityScore,
+            reviews: totalReviews,
+            vouches: vouchCount,
+            attestations: xpTotal > 0 ? Math.floor(xpTotal / 100) : 0, // Rough estimate
+            reputation: reputation,
+            trustLevel: this.calculateTrustLevel(normalizedScore),
+            profileUrl: user.links?.profile || `https://ethos.network/profile/${username}`,
             lastUpdated: new Date().toISOString(),
-            source: 'ethos_api'
+            source: 'ethos_api',
+            description: user.description || `Ethos Score: ${rawScore} | XP: ${xpTotal}`,
+            rawScore: rawScore,
+            xpTotal: xpTotal
         };
     },
 
@@ -607,7 +674,8 @@ const EthosMapper = {
                 <div class="reputation-section">
                     <h3>🏆 Reputation: ${data.reputation}</h3>
                     ${data.description ? `<p>${data.description}</p>` : ''}
-                    <p><small>Data source: ${data.source === 'ethos_api' ? 'Ethos Network API' : 'Demo Data'}</small></p>
+                    ${data.rawScore ? `<p><strong>Raw Ethos Score:</strong> ${data.rawScore} ${data.xpTotal ? `| <strong>XP:</strong> ${data.xpTotal}` : ''}</p>` : ''}
+                    <p><small>Data source: ${data.source === 'ethos_api' ? 'Live Ethos Network API' : 'Demo Data'}</small></p>
                 </div>
                 
                 <div class="action-buttons">
