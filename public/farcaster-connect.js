@@ -14,17 +14,30 @@ const FarcasterConnect = {
         // Wait for SDK to load
         await this.waitForSDK();
         
-        // Get context
+        // Get context and check for user
         if (this.sdk) {
             try {
                 this.context = await this.sdk.context;
                 console.log('📱 Context:', this.context);
+                
+                // Check if user is already available in context
+                if (this.context && this.context.user) {
+                    console.log('🎉 User found in context:', this.context.user);
+                    this.user = this.context.user;
+                }
                 
                 // Mark as ready
                 await this.sdk.actions.ready();
                 console.log('✅ SDK ready() called');
             } catch (error) {
                 console.warn('⚠️ Context error:', error);
+                // Still mark as ready even if context fails
+                try {
+                    await this.sdk.actions.ready();
+                    console.log('✅ SDK ready() called (fallback)');
+                } catch (readyError) {
+                    console.warn('⚠️ Ready() failed:', readyError);
+                }
             }
         }
         
@@ -187,14 +200,14 @@ const FarcasterConnect = {
                     ${fromFrame ? ' (Opened from Frame)' : ''}
                 </div>
                 
-                ${this.renderContent(isInMiniApp)}
+                ${this.renderContent(isInMiniApp, fromFrame)}
             </div>
         `;
         
         this.attachEvents();
     },
     
-    renderContent(isInMiniApp) {
+    renderContent(isInMiniApp, fromFrame) {
         if (this.user) {
             return this.renderProfile();
         }
@@ -219,7 +232,7 @@ const FarcasterConnect = {
         return `
             <div class="connect-section">
                 <h2>🔐 Connect Your Account</h2>
-                <p>Tap the button below to connect your Farcaster account</p>
+                <p>Your Farcaster account should automatically connect when opened in a Farcaster client. If not, tap the button below:</p>
                 <button class="btn" id="connectBtn" onclick="FarcasterConnect.connect()">
                     Connect Farcaster Account
                 </button>
@@ -261,21 +274,46 @@ const FarcasterConnect = {
         try {
             console.log('🔐 Starting Farcaster authentication...');
             
-            if (!this.sdk || !this.sdk.auth) {
+            if (!this.sdk) {
                 throw new Error('Farcaster SDK not available');
             }
             
-            const result = await this.sdk.auth.authenticate();
-            console.log('✅ Authentication result:', result);
-            
-            this.user = result.user || result;
-            
-            // Success haptic
-            if (this.sdk.haptics) {
-                await this.sdk.haptics.success();
+            // Check if we have context with user info
+            if (this.context && this.context.user) {
+                console.log('✅ Using context user:', this.context.user);
+                this.user = this.context.user;
+                
+                // Success haptic
+                if (this.sdk.haptics) {
+                    await this.sdk.haptics.success();
+                }
+                
+                this.render();
+                return;
             }
             
-            this.render();
+            // Try to get user info from SDK context
+            try {
+                const contextData = await this.sdk.context;
+                console.log('📱 Full context data:', contextData);
+                
+                if (contextData && contextData.user) {
+                    this.user = contextData.user;
+                    
+                    // Success haptic
+                    if (this.sdk.haptics) {
+                        await this.sdk.haptics.success();
+                    }
+                    
+                    this.render();
+                    return;
+                }
+            } catch (contextError) {
+                console.warn('⚠️ Context fetch error:', contextError);
+            }
+            
+            // If no user in context, show instructions
+            throw new Error('User authentication requires opening this app directly in Farcaster client (like Warpcast)');
             
         } catch (error) {
             console.error('❌ Authentication failed:', error);
