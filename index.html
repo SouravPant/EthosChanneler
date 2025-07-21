@@ -3,487 +3,515 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ethos Network - Farcaster Search</title>
+    <title>Farcaster User Search - Ethos Network</title>
     <style>
         body { 
-            font-family: Arial, sans-serif; 
-            max-width: 700px; 
-            margin: 50px auto; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px; 
+            margin: 0 auto; 
             padding: 20px; 
-            background: #0a0a0f;
+            background: #1a1a2e;
             color: #ffffff;
             line-height: 1.6;
+            min-height: 100vh;
         }
-        .container {
+        .header {
             text-align: center;
-            padding: 20px;
+            padding: 30px 0;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            margin-bottom: 30px;
         }
-        h1 { 
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+            margin-bottom: 10px;
         }
-        .search-section {
+        .tagline {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            margin: 0;
+        }
+        .search-container {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 30px;
-            margin: 30px 0;
-            text-align: left;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
         }
-        .search-section h3 {
-            color: #8b5cf6;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
-            text-align: center;
-        }
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        input { 
-            flex: 1;
-            padding: 15px; 
-            border: 1px solid #555; 
-            background: rgba(255, 255, 255, 0.1);
+        .search-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            background: rgba(0, 0, 0, 0.3);
             color: white;
-            border-radius: 6px;
+            border-radius: 12px;
             font-size: 16px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
         }
-        input::placeholder { 
-            color: rgba(255, 255, 255, 0.5); 
+        .search-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
         }
-        button { 
-            padding: 15px 30px; 
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white; 
-            border: none; 
-            cursor: pointer; 
-            border-radius: 6px;
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .search-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
             font-weight: 600;
-            font-size: 16px;
-            min-width: 120px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        button:hover { 
-            transform: translateY(-2px); 
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
         }
-        button:disabled { 
-            opacity: 0.6; 
-            cursor: not-allowed; 
+        .search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
             transform: none;
         }
         .examples {
-            margin-top: 15px;
-            text-align: center;
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
-        .example {
-            display: inline-block;
+        .example-chip {
             background: rgba(139, 92, 246, 0.2);
             color: #8b5cf6;
-            padding: 8px 16px;
-            margin: 5px;
+            padding: 6px 12px;
             border-radius: 20px;
+            font-size: 0.85rem;
             cursor: pointer;
-            font-size: 0.9rem;
             border: 1px solid rgba(139, 92, 246, 0.3);
+            transition: all 0.2s ease;
         }
-        .example:hover {
+        .example-chip:hover {
             background: rgba(139, 92, 246, 0.3);
-        }
-        .result { 
-            margin-top: 25px; 
-            padding: 25px; 
-            background: rgba(255, 255, 255, 0.1); 
-            border-radius: 8px; 
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .success { 
-            background: rgba(16, 185, 129, 0.1); 
-            border-color: rgba(16, 185, 129, 0.3);
-            color: #10b981;
-        }
-        .error { 
-            background: rgba(239, 68, 68, 0.1); 
-            border-color: rgba(239, 68, 68, 0.3);
-            color: #ef4444; 
-        }
-        .loading {
-            color: #60a5fa;
-            text-align: center;
+            transform: scale(1.05);
         }
         .user-card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 25px;
-            border-radius: 12px;
-            margin-top: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 20px;
+            padding: 24px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
         }
         .user-header {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
             margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .avatar {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        .user-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #8b5cf6;
+        }
+        .avatar-fallback {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
             font-weight: bold;
+            color: white;
         }
-        .user-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
+        .user-info h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: white;
         }
-        .stats {
+        .user-handle {
+            color: #8b5cf6;
+            font-size: 0.95rem;
+            margin: 4px 0;
+        }
+        .user-status {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+        }
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
         }
-        .stat {
-            background: rgba(99, 102, 241, 0.1);
-            padding: 15px;
-            border-radius: 8px;
+        .stat-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 16px;
+            border-radius: 12px;
             text-align: center;
+            border: 1px solid rgba(139, 92, 246, 0.1);
         }
         .stat-value {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: bold;
-            color: #6366f1;
+            color: #06b6d4;
+            margin-bottom: 4px;
         }
         .stat-label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: rgba(255, 255, 255, 0.7);
-            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .user-details {
-            margin-top: 20px;
-            padding: 15px;
+        .reviews-section {
+            margin: 20px 0;
+            padding: 16px;
             background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.1);
         }
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-        .detail-label {
+        .reviews-title {
+            font-size: 1rem;
             font-weight: 600;
             color: #8b5cf6;
-        }
-        .detail-value {
-            color: rgba(255, 255, 255, 0.9);
-            text-align: right;
-            max-width: 60%;
-            word-break: break-word;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .review-stats {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 12px;
         }
         .review-stat {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 10px;
-            border-radius: 6px;
             text-align: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
         }
-        .review-stat .value {
-            font-size: 1.1rem;
+        .review-positive { border-left: 3px solid #10b981; }
+        .review-neutral { border-left: 3px solid #f59e0b; }
+        .review-negative { border-left: 3px solid #ef4444; }
+        .review-count {
+            font-size: 1.2rem;
             font-weight: bold;
-            color: #10b981;
+            margin-bottom: 4px;
         }
-        .review-stat .label {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-top: 3px;
+        .review-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
         }
-        details {
-            margin-top: 20px;
+        .vouches-section {
+            margin: 20px 0;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.1);
         }
-        summary {
-            cursor: pointer;
+        .vouches-title {
+            font-size: 1rem;
+            font-weight: 600;
             color: #8b5cf6;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .vouch-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .vouch-item:last-child {
+            border-bottom: none;
+        }
+        .vouch-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .vouch-value {
+            color: #06b6d4;
             font-weight: 600;
         }
-        pre {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-size: 0.8rem;
-            overflow: auto;
-            max-height: 300px;
+        .error-card {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            color: #ef4444;
         }
-        .footer-info {
+        .loading-card {
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            color: #60a5fa;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(96, 165, 250, 0.3);
+            border-radius: 50%;
+            border-top-color: #60a5fa;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .footer {
             text-align: center;
             margin-top: 40px;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(139, 92, 246, 0.2);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🟣 Ethos Network</h1>
-        <p style="color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Search Farcaster users on Ethos Network</p>
-        
-        <!-- Farcaster Search -->
-        <div class="search-section">
-            <h3>Search by Farcaster Username</h3>
-            <div class="input-group">
-                <input type="text" id="farcasterInput" placeholder="Enter Farcaster username (without @)" value="">
-                <button onclick="searchFarcaster()" id="farcasterBtn">Search</button>
-            </div>
-            <div class="examples">
-                <span onclick="searchFarcasterExample('serpinxbt')" class="example">serpinxbt</span>
-                <span onclick="searchFarcasterExample('newtonhere')" class="example">newtonhere</span>
-                <span onclick="searchFarcasterExample('hrithik')" class="example">hrithik</span>
-            </div>
-            <div id="farcasterResult"></div>
-        </div>
+    <div class="header">
+        <div class="logo">🟣 Farcaster Search</div>
+        <p class="tagline">Discover user reputation on Ethos Network</p>
+    </div>
 
-        <div class="footer-info">
-            <strong>📡 API:</strong> <code>/api/v2/user/by/farcaster/username/{username}</code>
+    <div class="search-container">
+        <input 
+            type="text" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="Enter Farcaster username (without @)"
+            value=""
+        >
+        <button onclick="searchUser()" id="searchBtn" class="search-btn">
+            Search User
+        </button>
+        <div class="examples">
+            <span onclick="searchExample('serpinxbt')" class="example-chip">serpinxbt</span>
+            <span onclick="searchExample('newtonhere')" class="example-chip">newtonhere</span>
+            <span onclick="searchExample('hrithik')" class="example-chip">hrithik</span>
         </div>
+    </div>
+
+    <div id="results"></div>
+
+    <div class="footer">
+        Powered by Ethos Network API v2
     </div>
 
     <script>
         const API_BASE = 'https://api.ethos.network/api/v2';
 
-        // Farcaster Search Functions
-        function searchFarcasterExample(username) {
-            document.getElementById('farcasterInput').value = username;
-            searchFarcaster();
+        function searchExample(username) {
+            document.getElementById('searchInput').value = username;
+            searchUser();
         }
 
-        async function searchFarcaster() {
-            const username = document.getElementById('farcasterInput').value.trim();
-            const resultDiv = document.getElementById('farcasterResult');
-            const searchBtn = document.getElementById('farcasterBtn');
+        function weiToEth(weiAmount) {
+            if (!weiAmount || weiAmount === 0) return '0';
+            return (parseFloat(weiAmount) / 1000000000000000000).toFixed(6);
+        }
+
+        async function searchUser() {
+            const username = document.getElementById('searchInput').value.trim();
+            const resultsDiv = document.getElementById('results');
+            const searchBtn = document.getElementById('searchBtn');
 
             if (!username) {
-                resultDiv.innerHTML = `<div class="result error">Please enter a Farcaster username</div>`;
+                resultsDiv.innerHTML = `
+                    <div class="error-card">
+                        <h4>⚠️ Username Required</h4>
+                        <p>Please enter a Farcaster username to search</p>
+                    </div>
+                `;
                 return;
             }
 
             searchBtn.disabled = true;
             searchBtn.textContent = 'Searching...';
-            resultDiv.innerHTML = `<div class="result loading">🔄 Searching for @${username} on Ethos Network...</div>`;
+            resultsDiv.innerHTML = `
+                <div class="loading-card">
+                    <div class="loading-spinner"></div>
+                    Searching for @${username} on Ethos Network...
+                </div>
+            `;
 
             try {
                 const url = `${API_BASE}/user/by/farcaster/username/${username}`;
-                console.log('Farcaster API URL:', url);
-
                 const response = await fetch(url);
                 const data = await response.json();
 
-                console.log('Farcaster Response:', { status: response.status, data });
-
-                if (response.ok && data && data.user) {
-                    displayUser(data.user, resultDiv, username);
-                } else if (response.ok && data) {
-                    displayUser(data, resultDiv, username);
+                if (response.ok && data) {
+                    displayUser(data.user || data, username);
                 } else {
-                    resultDiv.innerHTML = `
-                        <div class="result error">
+                    resultsDiv.innerHTML = `
+                        <div class="error-card">
                             <h4>❌ User Not Found</h4>
                             <p>No user found for Farcaster username: <strong>@${username}</strong></p>
-                            <p><small>Status: ${response.status}</small></p>
-                            <details>
-                                <summary>Show API Response</summary>
-                                <pre>${JSON.stringify(data, null, 2)}</pre>
-                            </details>
+                            <p style="font-size: 0.85rem; margin-top: 10px;">Try a different username or check the spelling</p>
                         </div>
                     `;
                 }
             } catch (error) {
-                console.error('Farcaster Error:', error);
-                resultDiv.innerHTML = `
-                    <div class="result error">
-                        <h4>❌ Network Error</h4>
-                        <p>${error.message}</p>
+                resultsDiv.innerHTML = `
+                    <div class="error-card">
+                        <h4>🌐 Connection Error</h4>
+                        <p>Unable to connect to Ethos Network</p>
+                        <p style="font-size: 0.85rem; margin-top: 10px;">${error.message}</p>
                     </div>
                 `;
             } finally {
                 searchBtn.disabled = false;
-                searchBtn.textContent = 'Search';
+                searchBtn.textContent = 'Search User';
             }
         }
 
-        // Display User Function
-        function displayUser(userData, resultDiv, searchTerm) {
+        function displayUser(userData, searchTerm) {
             const name = userData.displayName || userData.username || searchTerm;
             const score = userData.score || 0;
             const xpTotal = userData.xpTotal || 0;
             const xpStreakDays = userData.xpStreakDays || 0;
-            const status = userData.status || 'Unknown';
+            const status = userData.status || 'Active';
 
-            // Build avatar/image
+            // Avatar HTML
             let avatarHtml = '';
             if (userData.avatarUrl) {
-                avatarHtml = `<img src="${userData.avatarUrl}" alt="${name}" class="user-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                             <div class="avatar" style="display: none;">${name.charAt(0).toUpperCase()}</div>`;
+                avatarHtml = `
+                    <img src="${userData.avatarUrl}" alt="${name}" class="user-avatar" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="avatar-fallback" style="display: none;">${name.charAt(0).toUpperCase()}</div>
+                `;
             } else {
-                avatarHtml = `<div class="avatar">${name.charAt(0).toUpperCase()}</div>`;
+                avatarHtml = `<div class="avatar-fallback">${name.charAt(0).toUpperCase()}</div>`;
             }
 
-            // Build review stats if available
-            let reviewStatsHtml = '';
-            if (userData.stats && userData.stats.review && userData.stats.review.received) {
+            // Reviews section
+            let reviewsHtml = '';
+            if (userData.stats?.review?.received) {
                 const reviews = userData.stats.review.received;
-                reviewStatsHtml = `
-                    <div class="review-stats">
-                        <div class="review-stat">
-                            <div class="value">${reviews.positive || 0}</div>
-                            <div class="label">Positive</div>
+                reviewsHtml = `
+                    <div class="reviews-section">
+                        <div class="reviews-title">
+                            📊 Community Reviews
                         </div>
-                        <div class="review-stat">
-                            <div class="value">${reviews.neutral || 0}</div>
-                            <div class="label">Neutral</div>
-                        </div>
-                        <div class="review-stat">
-                            <div class="value">${reviews.negative || 0}</div>
-                            <div class="label">Negative</div>
+                        <div class="review-stats">
+                            <div class="review-stat review-positive">
+                                <div class="review-count" style="color: #10b981;">${reviews.positive || 0}</div>
+                                <div class="review-label">Positive</div>
+                            </div>
+                            <div class="review-stat review-neutral">
+                                <div class="review-count" style="color: #f59e0b;">${reviews.neutral || 0}</div>
+                                <div class="review-label">Neutral</div>
+                            </div>
+                            <div class="review-stat review-negative">
+                                <div class="review-count" style="color: #ef4444;">${reviews.negative || 0}</div>
+                                <div class="review-label">Negative</div>
+                            </div>
                         </div>
                     </div>
                 `;
             }
 
-            // Build vouch stats if available
-            let vouchStatsHtml = '';
-            if (userData.stats && userData.stats.vouch) {
+            // Vouches section
+            let vouchesHtml = '';
+            if (userData.stats?.vouch) {
                 const vouch = userData.stats.vouch;
-                vouchStatsHtml = `
-                    <div class="user-details">
-                        <h4 style="margin: 0 0 10px 0; color: #8b5cf6;">💎 Vouch Statistics</h4>
+                vouchesHtml = `
+                    <div class="vouches-section">
+                        <div class="vouches-title">
+                            💎 Vouches
+                        </div>
                         ${vouch.given ? `
-                            <div class="detail-row">
-                                <span class="detail-label">Vouches Given:</span>
-                                <span class="detail-value">${vouch.given.count || 0} (${vouch.given.amountWeiTotal || 0} Wei)</span>
+                            <div class="vouch-item">
+                                <span class="vouch-label">Given</span>
+                                <span class="vouch-value">${vouch.given.count || 0} vouches (${weiToEth(vouch.given.amountWeiTotal)} ETH)</span>
                             </div>
                         ` : ''}
                         ${vouch.received ? `
-                            <div class="detail-row">
-                                <span class="detail-label">Vouches Received:</span>
-                                <span class="detail-value">${vouch.received.count || 0} (${vouch.received.amountWeiTotal || 0} Wei)</span>
+                            <div class="vouch-item">
+                                <span class="vouch-label">Received</span>
+                                <span class="vouch-value">${vouch.received.count || 0} vouches (${weiToEth(vouch.received.amountWeiTotal)} ETH)</span>
                             </div>
                         ` : ''}
                     </div>
                 `;
             }
 
-            resultDiv.innerHTML = `
-                <div class="result success">
-                    <h4>✅ Found User on Ethos Network</h4>
-                    <div class="user-card">
-                        <div class="user-header">
-                            ${avatarHtml}
-                            <div>
-                                <h3 style="margin: 0; color: white;">${name}</h3>
-                                <p style="margin: 5px 0; color: rgba(255,255,255,0.7);">@${searchTerm}</p>
-                                <p style="margin: 5px 0; color: rgba(255,255,255,0.6); font-size: 0.9rem;">Status: ${status}</p>
-                                ${userData.description ? `<p style="margin: 10px 0; font-style: italic; color: rgba(255,255,255,0.8);">${userData.description}</p>` : ''}
-                            </div>
+            document.getElementById('results').innerHTML = `
+                <div class="user-card">
+                    <div class="user-header">
+                        ${avatarHtml}
+                        <div class="user-info">
+                            <h3>${name}</h3>
+                            <div class="user-handle">@${searchTerm}</div>
+                            <div class="user-status">Status: ${status}</div>
+                            ${userData.description ? `<p style="margin: 8px 0 0 0; color: rgba(255,255,255,0.8); font-size: 0.9rem;">${userData.description}</p>` : ''}
                         </div>
-                        
-                        <div class="stats">
-                            <div class="stat">
-                                <div class="stat-value">${score}</div>
-                                <div class="stat-label">Credibility Score</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-value">${xpTotal}</div>
-                                <div class="stat-label">XP Total</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-value">${xpStreakDays}</div>
-                                <div class="stat-label">XP Streak Days</div>
-                            </div>
-                            <div class="stat">
-                                <div class="stat-value">${userData.profileId || 'N/A'}</div>
-                                <div class="stat-label">Profile ID</div>
-                            </div>
-                        </div>
-
-                        ${reviewStatsHtml ? `
-                            <div style="margin-top: 20px;">
-                                <h4 style="margin: 0 0 10px 0; color: #8b5cf6;">📊 Review Statistics</h4>
-                                ${reviewStatsHtml}
-                            </div>
-                        ` : ''}
-
-                        ${vouchStatsHtml}
-                        
-                        <div class="user-details">
-                            <h4 style="margin: 0 0 15px 0; color: #8b5cf6;">📋 Profile Details</h4>
-                            ${userData.id ? `
-                                <div class="detail-row">
-                                    <span class="detail-label">User ID:</span>
-                                    <span class="detail-value">${userData.id}</span>
-                                </div>
-                            ` : ''}
-                            ${userData.username ? `
-                                <div class="detail-row">
-                                    <span class="detail-label">Username:</span>
-                                    <span class="detail-value">${userData.username}</span>
-                                </div>
-                            ` : ''}
-                            ${userData.userkeys && userData.userkeys.length > 0 ? `
-                                <div class="detail-row">
-                                    <span class="detail-label">User Keys:</span>
-                                    <span class="detail-value">${userData.userkeys.join(', ')}</span>
-                                </div>
-                            ` : ''}
-                            ${userData.avatarUrl ? `
-                                <div class="detail-row">
-                                    <span class="detail-label">Avatar URL:</span>
-                                    <span class="detail-value"><a href="${userData.avatarUrl}" target="_blank" style="color: #8b5cf6;">View Image</a></span>
-                                </div>
-                            ` : ''}
-                        </div>
-                        
-                        ${userData.links ? `
-                            <div style="margin-top: 20px;">
-                                <strong>🔗 Links:</strong><br>
-                                ${userData.links.profile ? `<a href="${userData.links.profile}" target="_blank" style="color: #8b5cf6;">Profile</a><br>` : ''}
-                                ${userData.links.scoreBreakdown ? `<a href="${userData.links.scoreBreakdown}" target="_blank" style="color: #8b5cf6;">Score Breakdown</a>` : ''}
-                            </div>
-                        ` : ''}
-                        
-                        <details style="margin-top: 20px;">
-                            <summary>Show Raw API Data</summary>
-                            <pre>${JSON.stringify(userData, null, 2)}</pre>
-                        </details>
                     </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${score}</div>
+                            <div class="stat-label">Credibility</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${xpTotal}</div>
+                            <div class="stat-label">XP Total</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${xpStreakDays}</div>
+                            <div class="stat-label">XP Streak</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${userData.profileId || 'N/A'}</div>
+                            <div class="stat-label">Profile ID</div>
+                        </div>
+                    </div>
+
+                    ${reviewsHtml}
+                    ${vouchesHtml}
+
+                    ${userData.links?.profile ? `
+                        <div style="margin-top: 20px; text-align: center;">
+                            <a href="${userData.links.profile}" target="_blank" 
+                               style="color: #8b5cf6; text-decoration: none; font-weight: 600;">
+                                🔗 View Full Profile
+                            </a>
+                        </div>
+                    ` : ''}
                 </div>
             `;
         }
 
         // Enter key support
-        document.getElementById('farcasterInput').addEventListener('keypress', function(e) {
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                searchFarcaster();
+                searchUser();
             }
         });
 
-        console.log('🟣 Ethos Network Farcaster Search loaded');
-        console.log('Farcaster API:', API_BASE + '/user/by/farcaster/username/{username}');
+        console.log('🟣 Farcaster Search App loaded');
     </script>
 </body>
 </html>
