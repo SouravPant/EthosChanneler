@@ -1,0 +1,26 @@
+{
+  "name": "farcaster-ethos-search",
+  "version": "1.0.0",
+  "description": "Farcaster Frame for searching Ethos Network user reputation",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step needed for static site'",
+    "start": "vercel dev"
+  },
+  "keywords": [
+    "farcaster",
+    "frame",
+    "ethos",
+    "reputation",
+    "web3"
+  ],
+  "author": "Farcaster Search App",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  }
+}
