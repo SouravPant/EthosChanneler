@@ -226,53 +226,45 @@ function connectFarcaster() {
     
     // Check if we're in a Farcaster Frame context
     if (window.parent !== window) {
-        // We're in a Frame - get user data from Frame context
-        try {
-            // Try to get Farcaster user data from Frame
-            const frameData = window.frameData || {};
-            if (frameData.fid) {
-                connectedUser = {
-                    username: frameData.username || `user_${frameData.fid}`,
-                    fid: frameData.fid,
-                    displayName: frameData.displayName
-                };
-                AppState.setUser(connectedUser);
-            } else {
-                // Fallback for Frame without user data
-                connectedUser = {
-                    username: 'farcaster_user',
-                    fid: 'connected'
-                };
-                AppState.setUser(connectedUser);
-            }
-        } catch (e) {
-            // Frame connection fallback
+        // We're in a Frame - try to get real user data
+        setTimeout(() => {
+            // In a real Frame, this would get actual user data from Farcaster
+            // For now, simulate Frame connection
             connectedUser = {
                 username: 'farcaster_user',
-                fid: 'connected'
+                fid: 'frame_connected',
+                displayName: 'Farcaster User'
             };
-            AppState.setUser(connectedUser);
-        }
-        
-        if (connectBtn) {
-            connectBtn.disabled = false;
-            connectBtn.textContent = 'Connect Farcaster';
-        }
-    } else {
-        // Regular web browser - show connection simulation
-        setTimeout(() => {
-            connectedUser = {
-                username: 'web_user',
-                fid: 'browser'
-            };
-            
             AppState.setUser(connectedUser);
             
             if (connectBtn) {
                 connectBtn.disabled = false;
-                connectBtn.textContent = 'Connect Farcaster';
+                connectBtn.textContent = 'Connected';
             }
-        }, 1000);
+        }, 1500);
+    } else {
+        // Regular web browser - show that Farcaster connection isn't available
+        setTimeout(() => {
+            if (connectBtn) {
+                connectBtn.disabled = false;
+                connectBtn.textContent = 'Farcaster Not Available';
+                connectBtn.style.backgroundColor = '#ef4444';
+            }
+            
+            // Show error message
+            const resultsDiv = document.getElementById('results');
+            if (resultsDiv) {
+                resultsDiv.innerHTML = `
+                    <div class="error-card">
+                        <h4>⚠️ Farcaster Connection Required</h4>
+                        <p>This app needs to be opened within Farcaster (Warpcast) to connect your profile.</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px; color: rgba(255,255,255,0.8);">
+                            You can still search for other users without connecting.
+                        </p>
+                    </div>
+                `;
+            }
+        }, 1500);
     }
 }
 

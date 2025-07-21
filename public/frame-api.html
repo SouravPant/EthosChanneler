@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Frame API</title>
+</head>
+<body>
+    <script>
+        // Simple Frame API handler
+        if (window.location.search.includes('frame=true')) {
+            // Return Frame JSON response
+            const frameResponse = {
+                "type": "frame",
+                "frameUrl": "https://ethoschannel.netlify.app/",
+                "image": "https://ethoschannel.netlify.app/frame-image.svg",
+                "buttons": [
+                    {
+                        "label": "🔍 Search Users",
+                        "action": "link",
+                        "target": "https://ethoschannel.netlify.app/"
+                    },
+                    {
+                        "label": "👤 Connect & Search", 
+                        "action": "post",
+                        "target": "https://ethoschannel.netlify.app/"
+                    }
+                ]
+            };
+            
+            document.body.innerHTML = `<pre>${JSON.stringify(frameResponse, null, 2)}</pre>`;
+        } else {
+            // Redirect to main app
+            window.location.href = 'https://ethoschannel.netlify.app/';
+        }
+    </script>
+</body>
+</html>
