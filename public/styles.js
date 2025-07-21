@@ -495,6 +495,82 @@ const styles = `
         border: 2px solid #10b981 !important;
         background: linear-gradient(135deg, #1a1a2e, #16213e) !important;
     }
+
+    /* Farcaster Mini App Styles */
+    .frame-instructions-card {
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        border: 2px solid #8b5cf6;
+        border-radius: 12px;
+        padding: 25px;
+        margin: 20px 0;
+        color: white;
+        text-align: left;
+    }
+
+    .frame-instructions-card h3 {
+        margin: 0 0 15px 0;
+        font-size: 1.3rem;
+        color: white;
+    }
+
+    .instructions-list {
+        margin: 20px 0;
+    }
+
+    .instruction-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin: 12px 0;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+    }
+
+    .instruction-item .step {
+        background: #ffffff;
+        color: #8b5cf6;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+
+    .instruction-item span:last-child {
+        flex: 1;
+        line-height: 1.4;
+    }
+
+    .instruction-item code {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+    }
+
+    /* Frame button styles */
+    .frame-btn {
+        background: linear-gradient(135deg, #10b981, #059669);
+        border: none;
+        border-radius: 8px;
+        padding: 12px 20px;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin: 5px;
+    }
+
+    .frame-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
 `;
 
 // Function to inject styles into the page

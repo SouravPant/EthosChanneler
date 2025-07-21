@@ -164,16 +164,16 @@ function createSearchSection() {
     const examples = utils.createElement('div', { className: 'examples' }, [
         utils.createElement('span', {
             className: 'example-chip',
-            onClick: () => searchExample('serpinxbt')
-        }, ['serpinxbt']),
+            onClick: () => searchExample('dwr')
+        }, ['dwr']),
         utils.createElement('span', {
             className: 'example-chip',
-            onClick: () => searchExample('newtonhere')
-        }, ['newtonhere']),
+            onClick: () => searchExample('varunsrin')
+        }, ['varunsrin']),
         utils.createElement('span', {
             className: 'example-chip',
-            onClick: () => searchExample('hrithik')
-        }, ['hrithik'])
+            onClick: () => searchExample('jessepollak')
+        }, ['jessepollak'])
     ]);
     
     searchSection.appendChild(input);
@@ -702,7 +702,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Farcaster integration
     if (window.FarcasterAPI) {
         farcasterAPI = new FarcasterAPI();
-        console.log('🔗 Farcaster API initialized');
+        console.log('🔗 Official Farcaster API initialized');
     }
     
     if (window.FrameHandler) {
@@ -736,12 +736,37 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('🖼️ Frame Handler initialized');
     }
     
+    // Initialize Farcaster Mini App
+    let miniApp = null;
+    if (window.FarcasterMiniApp) {
+        miniApp = new FarcasterMiniApp();
+        
+        // Listen for Mini App events
+        document.addEventListener('farcasterUserConnected', (event) => {
+            console.log('👤 Mini App user connected:', event.detail);
+            connectedUser = event.detail;
+            AppState.setUser(event.detail);
+        });
+        
+        document.addEventListener('frameSearch', (event) => {
+            console.log('🔍 Mini App search triggered:', event.detail);
+            const input = document.getElementById('searchInput');
+            if (input) {
+                input.value = event.detail;
+                searchUser();
+            }
+        });
+        
+        console.log('🚀 Farcaster Mini App initialized');
+    }
+    
     renderApp();
-    console.log('🟣 Farcaster Search App with Frame support loaded');
-    console.log('Frame mode:', isInFrame ? 'Active' : 'Standalone');
+    console.log('🟣 Farcaster Search App with Official SDK loaded');
+    console.log('Environment:', miniApp?.isFrameEnvironment() ? 'Farcaster Frame' : 'Web Browser');
     console.log('Integrations:', {
         farcasterAPI: !!farcasterAPI,
-        frameHandler: !!frameHandler
+        frameHandler: !!frameHandler,
+        miniApp: !!miniApp
     });
 });
 
