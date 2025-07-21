@@ -1,10 +1,7 @@
 {
-  "buildCommand": "echo 'No build needed'",
-  "outputDirectory": ".",
   "functions": {
-    "api/*.js": {
-      "runtime": "nodejs18.x"
-    }
+    "api/frame.js": {},
+    "api/frame-image.js": {}
   },
   "headers": [
     {
@@ -23,12 +20,6 @@
           "value": "Content-Type"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/frame-image.png",
-      "destination": "/api/frame-image"
     }
   ]
 }

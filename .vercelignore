@@ -1,9 +1,4 @@
-backup/
-.env
-.env.example
+.git
+.gitignore
+README.md
 .replit
-replit.md
-VERCEL_DEPLOYMENT.md
-node_modules/
-*.log
-.git/
