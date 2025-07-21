@@ -20,4 +20,3 @@ vite.config.ts.*
 
 # Built assets (copied to root for Vercel)
 /assets/
-/index.html
