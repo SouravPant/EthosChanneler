@@ -224,19 +224,56 @@ function connectFarcaster() {
         connectBtn.textContent = 'Connecting...';
     }
     
-    setTimeout(() => {
-        connectedUser = {
-            username: 'demo_user',
-            fid: '12345'
-        };
-        
-        AppState.setUser(connectedUser);
+    // Check if we're in a Farcaster Frame context
+    if (window.parent !== window) {
+        // We're in a Frame - get user data from Frame context
+        try {
+            // Try to get Farcaster user data from Frame
+            const frameData = window.frameData || {};
+            if (frameData.fid) {
+                connectedUser = {
+                    username: frameData.username || `user_${frameData.fid}`,
+                    fid: frameData.fid,
+                    displayName: frameData.displayName
+                };
+                AppState.setUser(connectedUser);
+            } else {
+                // Fallback for Frame without user data
+                connectedUser = {
+                    username: 'farcaster_user',
+                    fid: 'connected'
+                };
+                AppState.setUser(connectedUser);
+            }
+        } catch (e) {
+            // Frame connection fallback
+            connectedUser = {
+                username: 'farcaster_user',
+                fid: 'connected'
+            };
+            AppState.setUser(connectedUser);
+        }
         
         if (connectBtn) {
             connectBtn.disabled = false;
             connectBtn.textContent = 'Connect Farcaster';
         }
-    }, 2000);
+    } else {
+        // Regular web browser - show connection simulation
+        setTimeout(() => {
+            connectedUser = {
+                username: 'web_user',
+                fid: 'browser'
+            };
+            
+            AppState.setUser(connectedUser);
+            
+            if (connectBtn) {
+                connectBtn.disabled = false;
+                connectBtn.textContent = 'Connect Farcaster';
+            }
+        }, 1000);
+    }
 }
 
 function disconnectFarcaster() {
