@@ -1,4 +1,6 @@
 {
+  "buildCommand": "echo 'Static site ready'",
+  "outputDirectory": "public",
   "functions": {
     "api/frame.js": {},
     "api/frame-image.js": {}
