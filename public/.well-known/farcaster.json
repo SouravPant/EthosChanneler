@@ -5,22 +5,25 @@
     "signature": "eZyYX5S_E3oIZuIk7US5G4wXRpR80752YuyZrqo2r90"
   },
   "frame": {
+    "name": "Ethos Mapper",
     "version": "1",
-    "name": "Farcaster Connect",
-    "subtitle": "Connect your Farcaster account",
-    "description": "A simple and elegant Farcaster Mini App that allows you to connect your account and view your profile information using the official Farcaster SDK.",
-    "iconUrl": "https://via.placeholder.com/192x192/667eea/ffffff?text=FC",
+    "iconUrl": "https://via.placeholder.com/192x192/667eea/ffffff?text=EM",
     "homeUrl": "https://ethoschannel.netlify.app",
+    "imageUrl": "https://via.placeholder.com/1200x630/667eea/ffffff?text=Ethos+Mapper",
     "splashImageUrl": "https://via.placeholder.com/200x200/667eea/ffffff?text=Loading",
     "splashBackgroundColor": "#667eea",
-    "heroImageUrl": "https://picsum.photos/1200/628?random=farcaster",
-    "tagline": "Connect and explore your Farcaster profile",
-    "screenshotUrls": [
-      "https://picsum.photos/400/800?random=screenshot1",
-      "https://picsum.photos/400/800?random=screenshot2"
-    ],
+    "webhookUrl": "https://ethoschannel.netlify.app/api/webhook",
+    "description": "A simple and elegant Farcaster Mini App that allows you to connect your account and view your profile information using the official Farcaster SDK.",
+    "subtitle": "Connect your Farcaster account for Ethos analysis",
     "primaryCategory": "social",
-    "tags": ["farcaster", "profile", "connect", "sdk"],
-    "webhookUrl": "https://ethoschannel.netlify.app/api/webhook"
+    "screenshotUrls": [
+      "https://via.placeholder.com/400x800/667eea/ffffff?text=Screenshot"
+    ],
+    "tags": [
+      "profile",
+      "connect",
+      "ethos"
+    ],
+    "tagline": "Ethos map to farcaster"
   }
 }

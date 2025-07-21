@@ -191,8 +191,8 @@ const FarcasterConnect = {
             
             <div class="container">
                 <div class="header">
-                    <h1>🔗 Farcaster Connect</h1>
-                    <p>Connect your Farcaster account and view your profile</p>
+                                    <h1>🗺️ Ethos Mapper</h1>
+                <p>Connect your Farcaster account for Ethos network analysis</p>
                 </div>
                 
                 <div class="status">
