@@ -164,16 +164,16 @@ function createSearchSection() {
     const examples = utils.createElement('div', { className: 'examples' }, [
         utils.createElement('span', {
             className: 'example-chip',
-            onClick: () => searchExample('dwr')
-        }, ['dwr']),
+            onClick: () => searchExample('serpinxbt')
+        }, ['serpinxbt']),
         utils.createElement('span', {
             className: 'example-chip',
-            onClick: () => searchExample('varunsrin')
-        }, ['varunsrin']),
+            onClick: () => searchExample('newtonhere')
+        }, ['newtonhere']),
         utils.createElement('span', {
             className: 'example-chip',
-            onClick: () => searchExample('jessepollak')
-        }, ['jessepollak'])
+            onClick: () => searchExample('hrithik')
+        }, ['hrithik'])
     ]);
     
     searchSection.appendChild(input);
@@ -389,6 +389,9 @@ async function searchUser() {
         if (ethosResponse.status === 'fulfilled' && ethosResponse.value.ok) {
             const data = await ethosResponse.value.json();
             ethosData = data.user || data;
+            console.log('📊 Ethos API Response:', data); // Debug log
+        } else if (ethosResponse.status === 'fulfilled') {
+            console.log('❌ Ethos API Error:', ethosResponse.value.status, ethosResponse.value.statusText);
         }
         
         // Process Farcaster response
@@ -399,6 +402,7 @@ async function searchUser() {
         if (ethosData || fcData) {
             // Merge data from both sources
             const mergedData = mergeFarcasterAndEthosData(ethosData, fcData);
+            console.log('🔄 Merged User Data:', mergedData); // Debug log
             displayUser(mergedData, username, false);
         } else {
             displayError('❌ User Not Found', 
@@ -515,11 +519,16 @@ function displayUser(userData, searchTerm, isMyProfile = false) {
     const resultsDiv = document.getElementById('results');
     if (!resultsDiv) return;
     
+    console.log('🎨 Displaying user data:', userData); // Debug log
+    
     const name = userData.displayName || userData.username || searchTerm;
-    const score = userData.score || 0;
-    const xpTotal = formatNumber(userData.xpTotal || 0);
-    const xpStreakDays = userData.xpStreakDays || 0;
-    const status = userData.status || 'Active';
+    
+    // Handle different possible data structures for score and XP
+    const score = userData.score || userData.credibilityScore || userData.reputation?.score || 0;
+    const rawXpTotal = userData.xpTotal || userData.xp?.total || userData.stats?.xp?.total || 0;
+    const xpTotal = formatNumber(rawXpTotal);
+    const xpStreakDays = userData.xpStreakDays || userData.xp?.streak || userData.stats?.xp?.streak || 0;
+    const status = userData.status || userData.activeStatus || 'Active';
     
     const cardClass = isMyProfile ? 'user-card my-profile-card' : 'user-card';
     const profileBadge = isMyProfile ? '<span class="profile-badge">MY PROFILE</span>' : '';
@@ -536,24 +545,28 @@ function displayUser(userData, searchTerm, isMyProfile = false) {
         avatarHtml = `<div class="avatar-fallback">${name.charAt(0).toUpperCase()}</div>`;
     }
     
-    // Reviews section
+    // Reviews section - handle different data structures
     let reviewsHtml = '';
-    if (userData.stats?.review?.received) {
-        const reviews = userData.stats.review.received;
+    const reviewData = userData.stats?.review?.received || userData.reviews?.received || userData.reviews;
+    if (reviewData) {
+        const positive = reviewData.positive || reviewData.positiveCount || 0;
+        const neutral = reviewData.neutral || reviewData.neutralCount || 0;
+        const negative = reviewData.negative || reviewData.negativeCount || 0;
+        
         reviewsHtml = `
             <div class="reviews-section">
                 <div class="reviews-title">📊 Community Reviews</div>
                 <div class="review-stats">
                     <div class="review-stat review-positive">
-                        <div class="review-count" style="color: #10b981;">${reviews.positive || 0}</div>
+                        <div class="review-count" style="color: #10b981;">${positive}</div>
                         <div class="review-label">Positive</div>
                     </div>
                     <div class="review-stat review-neutral">
-                        <div class="review-count" style="color: #f59e0b;">${reviews.neutral || 0}</div>
+                        <div class="review-count" style="color: #f59e0b;">${neutral}</div>
                         <div class="review-label">Neutral</div>
                     </div>
                     <div class="review-stat review-negative">
-                        <div class="review-count" style="color: #ef4444;">${reviews.negative || 0}</div>
+                        <div class="review-count" style="color: #ef4444;">${negative}</div>
                         <div class="review-label">Negative</div>
                     </div>
                 </div>
@@ -561,25 +574,26 @@ function displayUser(userData, searchTerm, isMyProfile = false) {
         `;
     }
     
-    // Vouches section
+    // Vouches section - handle different data structures
     let vouchesHtml = '';
-    if (userData.stats?.vouch) {
-        const vouch = userData.stats.vouch;
+    const vouchData = userData.stats?.vouch || userData.vouches || userData.vouch;
+    if (vouchData) {
+        const givenCount = vouchData.given?.count || vouchData.givenCount || 0;
+        const givenAmount = vouchData.given?.amountWeiTotal || vouchData.givenAmountWei || 0;
+        const receivedCount = vouchData.received?.count || vouchData.receivedCount || 0;
+        const receivedAmount = vouchData.received?.amountWeiTotal || vouchData.receivedAmountWei || 0;
+        
         vouchesHtml = `
             <div class="vouches-section">
                 <div class="vouches-title">💎 Vouches</div>
-                ${vouch.given ? `
-                    <div class="vouch-item">
-                        <span class="vouch-label">Given</span>
-                        <span class="vouch-value">${vouch.given.count || 0} vouches (${utils.weiToEth(vouch.given.amountWeiTotal)} ETH)</span>
-                    </div>
-                ` : ''}
-                ${vouch.received ? `
-                    <div class="vouch-item">
-                        <span class="vouch-label">Received</span>
-                        <span class="vouch-value">${vouch.received.count || 0} vouches (${utils.weiToEth(vouch.received.amountWeiTotal)} ETH)</span>
-                    </div>
-                ` : ''}
+                <div class="vouch-item">
+                    <span class="vouch-label">Given</span>
+                    <span class="vouch-value">${givenCount} vouches (${utils.weiToEth(givenAmount)} ETH)</span>
+                </div>
+                <div class="vouch-item">
+                    <span class="vouch-label">Received</span>
+                    <span class="vouch-value">${receivedCount} vouches (${utils.weiToEth(receivedAmount)} ETH)</span>
+                </div>
             </div>
         `;
     }

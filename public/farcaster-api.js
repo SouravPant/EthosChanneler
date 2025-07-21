@@ -231,6 +231,28 @@ class FarcasterAPI {
                 followingCount: 2000,
                 verifications: [],
                 activeStatus: 'active'
+            },
+            'newtonhere': {
+                fid: 23456,
+                username: 'newtonhere',
+                displayName: 'Newton Here',
+                pfpUrl: 'https://i.imgur.com/newtonhere.jpg',
+                profile: { bio: { text: 'Blockchain developer and DeFi enthusiast' } },
+                followerCount: 3000,
+                followingCount: 1500,
+                verifications: [],
+                activeStatus: 'active'
+            },
+            'hrithik': {
+                fid: 34567,
+                username: 'hrithik',
+                displayName: 'Hrithik',
+                pfpUrl: 'https://i.imgur.com/hrithik.jpg',
+                profile: { bio: { text: 'Web3 builder and NFT creator' } },
+                followerCount: 2500,
+                followingCount: 1200,
+                verifications: [],
+                activeStatus: 'active'
             }
         };
         
