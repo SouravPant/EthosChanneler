@@ -1,0 +1,10 @@
+VERCEL DEPLOYMENT FORCE TRIGGER
+==============================
+
+Current commit: a2c84b5
+Vercel stuck on: 89a5d58
+
+This file forces a new deployment.
+Frame meta tags are ready in public/index.html
+
+Deploy timestamp: $(date)
