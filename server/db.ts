@@ -22,11 +22,11 @@ if (!databaseUrl) {
 }
 
 // Try to determine if we should use SQLite (for local development)
-const useSQLite = isDevelopment && (
+const useSQLite = (isDevelopment && (
   !databaseUrl.includes('neon.tech') && 
   !databaseUrl.includes('postgres://') && 
   !databaseUrl.includes('postgresql://')
-) || databaseUrl.includes('sqlite:');
+)) || databaseUrl.includes('sqlite:');
 
 let db: any;
 let schema: any;
