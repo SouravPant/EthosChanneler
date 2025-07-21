@@ -771,14 +771,36 @@
                 });
 
                 if (!response.ok) {
-                    const error = await response.json();
+                    let error;
+                    try {
+                        error = await response.json();
+                    } catch (e) {
+                        error = { error: `HTTP ${response.status}: ${response.statusText}` };
+                    }
                     throw new Error(error.error || 'API request failed');
                 }
 
                 return await response.json();
             } catch (error) {
                 console.error('API Error:', error);
+                // If API is not available, show a helpful message
+                if (error.message.includes('fetch')) {
+                    throw new Error('API temporarily unavailable. Please try again later.');
+                }
                 throw error;
+            }
+        }
+
+        // Test API connectivity
+        async function testApiConnectivity() {
+            try {
+                await apiCall('health');
+                console.log('✅ API connectivity confirmed');
+                return true;
+            } catch (error) {
+                console.warn('⚠️ API not available:', error.message);
+                showNotification('API temporarily unavailable. Some features may be limited.', 'error');
+                return false;
             }
         }
 
@@ -1114,8 +1136,16 @@
 
                  // Initialize app on page load
          document.addEventListener('DOMContentLoaded', function() {
-             // Load real stats from API
-             setTimeout(loadStats, 1000);
+             // Test API connectivity first
+             testApiConnectivity().then(apiAvailable => {
+                 if (apiAvailable) {
+                     // Load real stats from API
+                     setTimeout(loadStats, 1000);
+                 } else {
+                     // Fallback to static stats animation
+                     setTimeout(animateStats, 1000);
+                 }
+             });
              
              // Add scroll effect to header
              window.addEventListener('scroll', function() {
