@@ -304,7 +304,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(users.credibilityScore))
       .limit(limit + 1);
     
-    return suggestedUsers.filter(user => user.id !== userId).slice(0, limit);
+    return suggestedUsers.filter((user: User) => user.id !== userId).slice(0, limit);
   }
 
   async createVouch(insertVouch: InsertVouch): Promise<Vouch> {
