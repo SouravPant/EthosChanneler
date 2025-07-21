@@ -433,6 +433,68 @@ const styles = `
     .hidden {
         display: none;
     }
+
+    /* Farcaster Integration Styles */
+    .success-card {
+        background: linear-gradient(135deg, #10b981, #059669);
+        border: 1px solid #10b981;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 20px 0;
+        color: white;
+    }
+
+    .info-card {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        border: 1px solid #3b82f6;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 20px 0;
+        color: white;
+    }
+
+    .connected-user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin: 15px 0;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+    }
+
+    .connected-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .farcaster-only {
+        border: 2px solid #8b5cf6;
+        background: linear-gradient(135deg, #1e1b4b, #312e81);
+    }
+
+    .farcaster-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .farcaster-only-notice {
+        background: rgba(139, 92, 246, 0.2);
+        border: 1px solid #8b5cf6;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .enhanced {
+        border: 2px solid #10b981 !important;
+        background: linear-gradient(135deg, #1a1a2e, #16213e) !important;
+    }
 `;
 
 // Function to inject styles into the page

@@ -4,6 +4,8 @@
 const API_BASE = 'https://api.ethos.network/api/v2';
 let connectedUser = null;
 let currentTab = 'search';
+let frameHandler = null;
+let farcasterAPI = null;
 
 // Check if running in Farcaster Frame context
 const isInFrame = window.parent !== window || window.location !== window.parent.location;
@@ -217,55 +219,118 @@ function createFooter() {
 }
 
 // Main Functions
-function connectFarcaster() {
+async function connectFarcaster() {
     const connectBtn = document.querySelector('.connect-btn');
     if (connectBtn) {
         connectBtn.disabled = true;
         connectBtn.textContent = 'Connecting...';
     }
     
-    // Check if we're in a Farcaster Frame context
-    if (window.parent !== window) {
-        // We're in a Frame - try to get real user data
-        setTimeout(() => {
-            // In a real Frame, this would get actual user data from Farcaster
-            // For now, simulate Frame connection
-            connectedUser = {
-                username: 'farcaster_user',
-                fid: 'frame_connected',
-                displayName: 'Farcaster User'
-            };
-            AppState.setUser(connectedUser);
-            
-            if (connectBtn) {
-                connectBtn.disabled = false;
-                connectBtn.textContent = 'Connected';
+    try {
+        if (frameHandler && frameHandler.isInFrame) {
+            // Real Frame connection
+            const fcUser = await frameHandler.connectFarcaster();
+            if (fcUser) {
+                connectedUser = {
+                    ...fcUser,
+                    source: 'farcaster_frame'
+                };
+                AppState.setUser(connectedUser);
+                
+                if (connectBtn) {
+                    connectBtn.disabled = false;
+                    connectBtn.textContent = `Connected as @${fcUser.username}`;
+                    connectBtn.style.backgroundColor = '#10b981';
+                }
+                
+                // Show success message
+                displayConnectionSuccess(fcUser);
+                return;
             }
-        }, 1500);
-    } else {
-        // Regular web browser - show that Farcaster connection isn't available
-        setTimeout(() => {
-            if (connectBtn) {
-                connectBtn.disabled = false;
-                connectBtn.textContent = 'Farcaster Not Available';
-                connectBtn.style.backgroundColor = '#ef4444';
-            }
-            
-            // Show error message
-            const resultsDiv = document.getElementById('results');
-            if (resultsDiv) {
-                resultsDiv.innerHTML = `
-                    <div class="error-card">
-                        <h4>⚠️ Farcaster Connection Required</h4>
-                        <p>This app needs to be opened within Farcaster (Warpcast) to connect your profile.</p>
-                        <p style="font-size: 0.9rem; margin-top: 10px; color: rgba(255,255,255,0.8);">
-                            You can still search for other users without connecting.
-                        </p>
-                    </div>
-                `;
-            }
-        }, 1500);
+        }
+        
+        // Fallback for non-Frame context
+        if (connectBtn) {
+            connectBtn.disabled = false;
+            connectBtn.textContent = 'Open in Farcaster';
+            connectBtn.style.backgroundColor = '#8b5cf6';
+        }
+        
+        // Show Frame required message
+        displayFrameRequired();
+        
+    } catch (error) {
+        console.error('Farcaster connection error:', error);
+        
+        if (connectBtn) {
+            connectBtn.disabled = false;
+            connectBtn.textContent = 'Connection Failed';
+            connectBtn.style.backgroundColor = '#ef4444';
+        }
+        
+        displayConnectionError(error.message);
     }
+}
+
+function displayConnectionSuccess(user) {
+    const resultsDiv = document.getElementById('results');
+    if (!resultsDiv) return;
+    
+    resultsDiv.innerHTML = `
+        <div class="success-card">
+            <h4>✅ Connected to Farcaster!</h4>
+            <div class="connected-user-info">
+                ${user.avatarUrl ? `<img src="${user.avatarUrl}" alt="${user.displayName}" class="connected-avatar">` : ''}
+                <div>
+                    <p><strong>${user.displayName}</strong> (@${user.username})</p>
+                    <p>FID: ${user.fid}</p>
+                    <p>Followers: ${user.followerCount?.toLocaleString() || 0}</p>
+                </div>
+            </div>
+            <p style="margin-top: 15px; color: rgba(255,255,255,0.8);">
+                You can now view your profile and search for other users!
+            </p>
+        </div>
+    `;
+}
+
+function displayFrameRequired() {
+    const resultsDiv = document.getElementById('results');
+    if (!resultsDiv) return;
+    
+    resultsDiv.innerHTML = `
+        <div class="info-card">
+            <h4>🖼️ Farcaster Frame Required</h4>
+            <p>To connect your Farcaster profile, this app needs to be opened as a Frame within Farcaster.</p>
+            <div style="margin: 15px 0;">
+                <strong>How to use as a Frame:</strong>
+                <ol style="text-align: left; margin: 10px 0; padding-left: 20px;">
+                    <li>Copy this URL: <code>https://ethoschannel.netlify.app</code></li>
+                    <li>Paste it in a Warpcast cast</li>
+                    <li>The Frame will appear with interactive buttons</li>
+                    <li>Your Farcaster profile will be automatically connected</li>
+                </ol>
+            </div>
+            <p style="color: rgba(255,255,255,0.8);">
+                You can still search for other users without connecting.
+            </p>
+        </div>
+    `;
+}
+
+function displayConnectionError(message) {
+    const resultsDiv = document.getElementById('results');
+    if (!resultsDiv) return;
+    
+    resultsDiv.innerHTML = `
+        <div class="error-card">
+            <h4>❌ Connection Failed</h4>
+            <p>${message}</p>
+            <p style="margin-top: 10px; color: rgba(255,255,255,0.8);">
+                Please try again or use the app as a Farcaster Frame.
+            </p>
+        </div>
+    `;
 }
 
 function disconnectFarcaster() {
@@ -308,26 +373,86 @@ async function searchUser() {
         searchBtn.textContent = 'Searching...';
     }
     
-    displayLoading(`Searching for @${username} on Ethos Network...`);
+    displayLoading(`Searching for @${username} on Ethos Network and Farcaster...`);
     
     try {
-        const url = `${API_BASE}/user/by/farcaster/username/${username}`;
-        const response = await fetch(url);
-        const data = await response.json();
+        // Search both Ethos and Farcaster simultaneously
+        const [ethosResponse, farcasterData] = await Promise.allSettled([
+            fetch(`${API_BASE}/user/by/farcaster/username/${username}`),
+            farcasterAPI ? farcasterAPI.getUserByUsername(username) : Promise.resolve(null)
+        ]);
         
-        if (response.ok && data) {
-            displayUser(data.user || data, username, false);
-        } else {
-            displayError('❌ User Not Found', `No user found for Farcaster username: @${username}`, 'Try a different username or check the spelling');
+        let ethosData = null;
+        let fcData = null;
+        
+        // Process Ethos response
+        if (ethosResponse.status === 'fulfilled' && ethosResponse.value.ok) {
+            const data = await ethosResponse.value.json();
+            ethosData = data.user || data;
         }
+        
+        // Process Farcaster response
+        if (farcasterData.status === 'fulfilled' && farcasterData.value) {
+            fcData = farcasterData.value;
+        }
+        
+        if (ethosData || fcData) {
+            // Merge data from both sources
+            const mergedData = mergeFarcasterAndEthosData(ethosData, fcData);
+            displayUser(mergedData, username, false);
+        } else {
+            displayError('❌ User Not Found', 
+                `No user found for Farcaster username: @${username}`, 
+                'Try a different username or check the spelling');
+        }
+        
     } catch (error) {
-        displayError('🌐 Connection Error', 'Unable to connect to Ethos Network', error.message);
+        console.error('Search error:', error);
+        displayError('🌐 Connection Error', 'Unable to connect to search services', error.message);
     } finally {
         if (searchBtn) {
             searchBtn.disabled = false;
             searchBtn.textContent = 'Search User';
         }
     }
+}
+
+function mergeFarcasterAndEthosData(ethosData, farcasterData) {
+    if (!ethosData && !farcasterData) return null;
+    if (!ethosData) return formatFarcasterOnlyData(farcasterData);
+    if (!farcasterData) return ethosData;
+    
+    // Merge both datasets, preferring Farcaster for profile info
+    return {
+        ...ethosData,
+        displayName: farcasterData.display_name || ethosData.displayName,
+        avatarUrl: farcasterData.pfp_url || ethosData.avatarUrl,
+        bio: farcasterData.profile?.bio?.text || ethosData.description,
+        farcaster: {
+            fid: farcasterData.fid,
+            followerCount: farcasterData.follower_count,
+            followingCount: farcasterData.following_count,
+            verifications: farcasterData.verifications || [],
+            activeStatus: farcasterData.active_status
+        }
+    };
+}
+
+function formatFarcasterOnlyData(farcasterData) {
+    return {
+        displayName: farcasterData.display_name || farcasterData.username,
+        username: farcasterData.username,
+        avatarUrl: farcasterData.pfp_url,
+        description: farcasterData.profile?.bio?.text || '',
+        farcasterOnly: true,
+        farcaster: {
+            fid: farcasterData.fid,
+            followerCount: farcasterData.follower_count,
+            followingCount: farcasterData.following_count,
+            verifications: farcasterData.verifications || [],
+            activeStatus: farcasterData.active_status
+        }
+    };
 }
 
 async function showMyProfile() {
@@ -574,9 +699,50 @@ function renderApp() {
 
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Farcaster integration
+    if (window.FarcasterAPI) {
+        farcasterAPI = new FarcasterAPI();
+        console.log('🔗 Farcaster API initialized');
+    }
+    
+    if (window.FrameHandler) {
+        frameHandler = new FrameHandler();
+        frameHandler.init();
+        
+        // Set up Frame event listeners
+        frameHandler.on('userConnected', (user) => {
+            console.log('👤 Farcaster user connected:', user);
+            connectedUser = user;
+            AppState.setUser(user);
+        });
+        
+        frameHandler.on('buttonClick', (data) => {
+            console.log('🔘 Frame button clicked:', data);
+            if (data.buttonIndex === 1) {
+                // Search button
+                if (data.inputText) {
+                    const input = document.getElementById('searchInput');
+                    if (input) {
+                        input.value = data.inputText;
+                        searchUser();
+                    }
+                }
+            } else if (data.buttonIndex === 2) {
+                // Connect & Search button
+                connectFarcaster();
+            }
+        });
+        
+        console.log('🖼️ Frame Handler initialized');
+    }
+    
     renderApp();
     console.log('🟣 Farcaster Search App with Frame support loaded');
     console.log('Frame mode:', isInFrame ? 'Active' : 'Standalone');
+    console.log('Integrations:', {
+        farcasterAPI: !!farcasterAPI,
+        frameHandler: !!frameHandler
+    });
 });
 
 // Export for module usage
