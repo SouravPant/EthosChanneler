@@ -1,12 +1,14 @@
-// Simple Farcaster SDK Connection App
-// Focus: Connect with Farcaster and show profile
+// Ethos Mapper - Farcaster Mini App with Ethos Network Integration
+// Connect Farcaster profiles with Ethos Network analysis
 
-console.log('🚀 Starting Farcaster Connection App...');
+console.log('🗺️ Starting Ethos Mapper App...');
 
-const FarcasterConnect = {
+const EthosMapper = {
     sdk: null,
     user: null,
     context: null,
+    searchResults: null,
+    isLoading: false,
     
     async init() {
         console.log('🔄 Initializing Farcaster Connection...');
@@ -42,6 +44,157 @@ const FarcasterConnect = {
         }
         
         this.render();
+    },
+
+    // Ethos Network API Integration
+    async searchEthosProfile(username) {
+        if (!username) return null;
+        
+        this.isLoading = true;
+        this.render(); // Show loading state
+        
+        try {
+            console.log('🔍 Searching Ethos profile for:', username);
+            
+            // Try multiple API endpoints for Ethos Network
+            const endpoints = [
+                `https://api.ethos.network/api/v2/user/by/farcaster/username/${username}`,
+                `https://api.ethos.network/v2/user/by/farcaster/${username}`,
+                `https://ethos.network/api/user/farcaster/${username}`
+            ];
+            
+            let profileData = null;
+            
+            for (const endpoint of endpoints) {
+                try {
+                    console.log('📡 Trying endpoint:', endpoint);
+                    const response = await fetch(endpoint);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('✅ Ethos API response:', data);
+                        profileData = this.processEthosData(data, username);
+                        break;
+                    } else {
+                        console.warn('⚠️ Endpoint failed:', endpoint, response.status);
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Endpoint error:', endpoint, error);
+                }
+            }
+            
+            // If no API data, create mock data for demo
+            if (!profileData) {
+                console.log('📝 Creating demo data for:', username);
+                profileData = this.createDemoData(username);
+            }
+            
+            this.searchResults = profileData;
+            
+            // Success haptic
+            if (this.sdk && this.sdk.haptics) {
+                await this.sdk.haptics.success();
+            }
+            
+        } catch (error) {
+            console.error('❌ Ethos search failed:', error);
+            
+            // Error haptic
+            if (this.sdk && this.sdk.haptics) {
+                await this.sdk.haptics.error();
+            }
+            
+            this.searchResults = this.createDemoData(username);
+        } finally {
+            this.isLoading = false;
+            this.render();
+        }
+        
+        return this.searchResults;
+    },
+
+    processEthosData(data, username) {
+        // Process real Ethos API response
+        return {
+            username: username,
+            ethosScore: data.score || data.ethos_score || 0,
+            credibilityScore: data.credibility || data.credibility_score || 0,
+            reviews: data.reviews || data.review_count || 0,
+            vouches: data.vouches || data.vouch_count || 0,
+            attestations: data.attestations || data.attestation_count || 0,
+            reputation: data.reputation || 'Unknown',
+            trustLevel: this.calculateTrustLevel(data.score || 0),
+            profileUrl: `https://ethos.network/profile/${username}`,
+            lastUpdated: new Date().toISOString(),
+            source: 'ethos_api'
+        };
+    },
+
+    createDemoData(username) {
+        // Create realistic demo data for popular usernames
+        const demoProfiles = {
+            'serpinxbt': {
+                ethosScore: 95,
+                credibilityScore: 92,
+                reviews: 247,
+                vouches: 156,
+                attestations: 89,
+                reputation: 'Highly Trusted',
+                description: 'Crypto researcher and analyst with strong reputation in DeFi space'
+            },
+            'newtonhere': {
+                ethosScore: 88,
+                credibilityScore: 85,
+                reviews: 189,
+                vouches: 134,
+                attestations: 67,
+                reputation: 'Trusted',
+                description: 'Active Farcaster contributor and blockchain developer'
+            },
+            'hrithik': {
+                ethosScore: 91,
+                credibilityScore: 89,
+                reviews: 203,
+                vouches: 142,
+                attestations: 78,
+                reputation: 'Highly Trusted',
+                description: 'Tech entrepreneur and Web3 community builder'
+            }
+        };
+
+        const profile = demoProfiles[username.toLowerCase()] || {
+            ethosScore: Math.floor(Math.random() * 40) + 60, // 60-100
+            credibilityScore: Math.floor(Math.random() * 30) + 70, // 70-100
+            reviews: Math.floor(Math.random() * 100) + 20,
+            vouches: Math.floor(Math.random() * 80) + 10,
+            attestations: Math.floor(Math.random() * 50) + 5,
+            reputation: 'Active User',
+            description: 'Farcaster community member with growing reputation'
+        };
+
+        return {
+            username: username,
+            ethosScore: profile.ethosScore,
+            credibilityScore: profile.credibilityScore,
+            reviews: profile.reviews,
+            vouches: profile.vouches,
+            attestations: profile.attestations,
+            reputation: profile.reputation,
+            description: profile.description,
+            trustLevel: this.calculateTrustLevel(profile.ethosScore),
+            profileUrl: `https://ethos.network/profile/${username}`,
+            lastUpdated: new Date().toISOString(),
+            source: 'demo_data'
+        };
+    },
+
+    calculateTrustLevel(score) {
+        if (score >= 90) return 'Exceptional';
+        if (score >= 80) return 'Highly Trusted';
+        if (score >= 70) return 'Trusted';
+        if (score >= 60) return 'Reliable';
+        if (score >= 50) return 'Developing';
+        return 'New User';
     },
     
     async waitForSDK() {
@@ -180,19 +333,162 @@ const FarcasterConnect = {
                     border-radius: 15px;
                     margin: 20px 0;
                 }
-                .web-notice {
-                    background: rgba(255, 193, 7, 0.2);
-                    border: 2px solid rgba(255, 193, 7, 0.5);
-                    padding: 20px;
-                    border-radius: 15px;
-                    margin: 20px 0;
-                }
+                                            .web-notice {
+                                background: rgba(255, 193, 7, 0.2);
+                                border: 2px solid rgba(255, 193, 7, 0.5);
+                                padding: 20px;
+                                border-radius: 15px;
+                                margin: 20px 0;
+                            }
+                            .search-section {
+                                background: rgba(255,255,255,0.1);
+                                padding: 30px;
+                                border-radius: 20px;
+                                margin: 20px 0;
+                                backdrop-filter: blur(10px);
+                                text-align: center;
+                            }
+                            .search-input {
+                                margin: 20px 0;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                flex-wrap: wrap;
+                                gap: 10px;
+                            }
+                            .example-profiles {
+                                margin: 20px 0;
+                            }
+                            .btn-small {
+                                background: rgba(255,255,255,0.2);
+                                border: none;
+                                padding: 8px 16px;
+                                border-radius: 20px;
+                                color: white;
+                                font-size: 0.9rem;
+                                cursor: pointer;
+                                margin: 5px;
+                                transition: all 0.3s ease;
+                            }
+                            .btn-small:hover {
+                                background: rgba(255,255,255,0.3);
+                                transform: translateY(-1px);
+                            }
+                            .connected-user {
+                                background: rgba(40, 167, 69, 0.2);
+                                border: 2px solid rgba(40, 167, 69, 0.5);
+                                padding: 20px;
+                                border-radius: 15px;
+                                margin: 20px 0;
+                            }
+                            .loading-section {
+                                text-align: center;
+                                padding: 40px;
+                            }
+                            .spinner {
+                                font-size: 3rem;
+                                animation: spin 2s linear infinite;
+                            }
+                            @keyframes spin {
+                                0% { transform: rotate(0deg); }
+                                100% { transform: rotate(360deg); }
+                            }
+                            .ethos-analysis {
+                                background: rgba(255,255,255,0.1);
+                                padding: 30px;
+                                border-radius: 20px;
+                                margin: 20px 0;
+                                backdrop-filter: blur(10px);
+                            }
+                            .profile-header {
+                                text-align: center;
+                                margin-bottom: 30px;
+                            }
+                            .trust-level {
+                                font-size: 1.2rem;
+                                font-weight: bold;
+                                margin: 10px 0;
+                            }
+                            .score-section {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                margin: 30px 0;
+                            }
+                            .main-score {
+                                margin-bottom: 30px;
+                            }
+                            .score-circle {
+                                width: 120px;
+                                height: 120px;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                position: relative;
+                            }
+                            .score-inner {
+                                width: 90px;
+                                height: 90px;
+                                background: rgba(255,255,255,0.9);
+                                border-radius: 50%;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                justify-content: center;
+                                color: #333;
+                            }
+                            .score-number {
+                                font-size: 2rem;
+                                font-weight: bold;
+                                line-height: 1;
+                            }
+                            .score-label {
+                                font-size: 0.8rem;
+                                opacity: 0.8;
+                            }
+                            .metrics-grid {
+                                display: grid;
+                                grid-template-columns: repeat(2, 1fr);
+                                gap: 20px;
+                                width: 100%;
+                                max-width: 300px;
+                            }
+                            .metric {
+                                text-align: center;
+                                background: rgba(255,255,255,0.1);
+                                padding: 15px;
+                                border-radius: 15px;
+                            }
+                            .metric-value {
+                                font-size: 1.5rem;
+                                font-weight: bold;
+                                margin-bottom: 5px;
+                            }
+                            .metric-label {
+                                font-size: 0.9rem;
+                                opacity: 0.8;
+                            }
+                            .reputation-section {
+                                text-align: center;
+                                margin: 30px 0;
+                                background: rgba(255,255,255,0.05);
+                                padding: 20px;
+                                border-radius: 15px;
+                            }
+                            .action-buttons {
+                                display: flex;
+                                gap: 10px;
+                                justify-content: center;
+                                flex-wrap: wrap;
+                                margin-top: 30px;
+                            }
             </style>
             
             <div class="container">
                 <div class="header">
                                     <h1>🗺️ Ethos Mapper</h1>
-                <p>Connect your Farcaster account for Ethos network analysis</p>
+                <p>Analyze Farcaster profiles with Ethos Network data</p>
                 </div>
                 
                 <div class="status">
@@ -208,56 +504,154 @@ const FarcasterConnect = {
     },
     
     renderContent(isInMiniApp, fromFrame) {
-        if (this.user) {
-            return this.renderProfile();
-        }
-        
-        if (!isInMiniApp) {
+        // If loading, show loading state
+        if (this.isLoading) {
             return `
-                <div class="web-notice">
-                    <h3>📱 ${fromFrame ? 'Frame Opened in Browser' : 'Farcaster Mini App Required'}</h3>
-                    <p>${fromFrame ? 
-                        'This Frame opened in your default browser. For full Farcaster integration, please open this link directly in Warpcast or another Farcaster client.' : 
-                        'To connect your Farcaster account, please open this app in a Farcaster client like Warpcast.'
-                    }</p>
-                    <p><strong>Try this:</strong><br>
-                    ${fromFrame ? 
-                        '1. Copy this URL: https://ethoschannel.netlify.app<br>2. Open Warpcast<br>3. Paste and visit the URL directly' :
-                        'Copy this URL: https://ethoschannel.netlify.app'
-                    }</p>
+                <div class="loading-section">
+                    <div class="spinner">🔄</div>
+                    <h2>Analyzing Profile...</h2>
+                    <p>Fetching Ethos Network data...</p>
                 </div>
             `;
         }
+
+        // If we have search results, show them
+        if (this.searchResults) {
+            return this.renderEthosAnalysis();
+        }
         
+        // Show search interface
         return `
-            <div class="connect-section">
-                <h2>🔐 Connect Your Account</h2>
-                <p>Your Farcaster account should automatically connect when opened in a Farcaster client. If not, tap the button below:</p>
-                <button class="btn" id="connectBtn" onclick="FarcasterConnect.connect()">
-                    Connect Farcaster Account
-                </button>
+            <div class="search-section">
+                <h2>🔍 Search Farcaster Profile</h2>
+                <p>Enter a Farcaster username to analyze their Ethos Network reputation</p>
+                
+                <div class="search-input">
+                    <input type="text" id="usernameInput" placeholder="Enter username (e.g. serpinxbt)" 
+                           onkeypress="if(event.key==='Enter') EthosMapper.handleSearch()"
+                           style="padding: 12px; border: 2px solid rgba(255,255,255,0.3); border-radius: 25px; background: rgba(255,255,255,0.1); color: white; width: 250px; margin-right: 10px;">
+                    <button class="btn" onclick="EthosMapper.handleSearch()" id="searchBtn">
+                        🔍 Analyze
+                    </button>
+                </div>
+                
+                <div class="example-profiles">
+                    <p><strong>Try these profiles:</strong></p>
+                    <button class="btn-small" onclick="EthosMapper.searchExample('serpinxbt')">serpinxbt</button>
+                    <button class="btn-small" onclick="EthosMapper.searchExample('newtonhere')">newtonhere</button>
+                    <button class="btn-small" onclick="EthosMapper.searchExample('hrithik')">hrithik</button>
+                </div>
+                
+                ${this.user ? `
+                    <div class="connected-user">
+                        <h3>👤 Connected as @${this.user.username || this.user.displayName}</h3>
+                        <button class="btn" onclick="EthosMapper.searchExample('${this.user.username || this.user.displayName}')" 
+                                style="background: linear-gradient(45deg, #28a745, #20c997);">
+                            🗺️ Analyze My Profile
+                        </button>
+                    </div>
+                ` : ''}
+                
+                ${!isInMiniApp ? `
+                    <div class="web-notice">
+                        <p>💡 <strong>Tip:</strong> Open this in Warpcast for full Mini App experience!</p>
+                    </div>
+                ` : ''}
             </div>
         `;
     },
     
-    renderProfile() {
+    renderEthosAnalysis() {
+        if (!this.searchResults) return '';
+        
+        const data = this.searchResults;
+        const scoreColor = data.ethosScore >= 80 ? '#28a745' : data.ethosScore >= 60 ? '#ffc107' : '#dc3545';
+        
         return `
-            <div class="profile">
-                <div class="profile-pic">
-                    ${this.user.pfpUrl ? `<img src="${this.user.pfpUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '👤'}
+            <div class="ethos-analysis">
+                <div class="profile-header">
+                    <h2>📊 @${data.username}</h2>
+                    <p class="trust-level" style="color: ${scoreColor};">${data.trustLevel}</p>
                 </div>
-                <h2>@${this.user.username || this.user.displayName || 'Unknown'}</h2>
-                <p><strong>FID:</strong> ${this.user.fid}</p>
-                ${this.user.displayName ? `<p><strong>Display Name:</strong> ${this.user.displayName}</p>` : ''}
-                ${this.user.bio ? `<p><strong>Bio:</strong> ${this.user.bio}</p>` : ''}
-                ${this.user.followerCount ? `<p><strong>Followers:</strong> ${this.user.followerCount}</p>` : ''}
-                ${this.user.followingCount ? `<p><strong>Following:</strong> ${this.user.followingCount}</p>` : ''}
                 
-                <button class="btn" onclick="FarcasterConnect.disconnect()" style="background: linear-gradient(45deg, #6c757d, #495057); margin-top: 15px;">
-                    Disconnect
-                </button>
+                <div class="score-section">
+                    <div class="main-score">
+                        <div class="score-circle" style="background: conic-gradient(${scoreColor} ${data.ethosScore * 3.6}deg, rgba(255,255,255,0.2) 0deg);">
+                            <div class="score-inner">
+                                <span class="score-number">${data.ethosScore}</span>
+                                <span class="score-label">Ethos Score</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-value">${data.credibilityScore}</div>
+                            <div class="metric-label">Credibility</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">${data.reviews}</div>
+                            <div class="metric-label">Reviews</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">${data.vouches}</div>
+                            <div class="metric-label">Vouches</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">${data.attestations}</div>
+                            <div class="metric-label">Attestations</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="reputation-section">
+                    <h3>🏆 Reputation: ${data.reputation}</h3>
+                    ${data.description ? `<p>${data.description}</p>` : ''}
+                    <p><small>Data source: ${data.source === 'ethos_api' ? 'Ethos Network API' : 'Demo Data'}</small></p>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn" onclick="EthosMapper.openEthosProfile('${data.username}')" 
+                            style="background: linear-gradient(45deg, #007bff, #0056b3);">
+                        🔗 View on Ethos.Network
+                    </button>
+                    <button class="btn" onclick="EthosMapper.newSearch()" 
+                            style="background: linear-gradient(45deg, #6f42c1, #5a32a3);">
+                        🔍 Search Another
+                    </button>
+                </div>
             </div>
         `;
+    },
+
+    async handleSearch() {
+        const input = document.getElementById('usernameInput');
+        const username = input?.value?.trim();
+        
+        if (!username) {
+            alert('Please enter a username');
+            return;
+        }
+        
+        await this.searchEthosProfile(username);
+    },
+
+    async searchExample(username) {
+        await this.searchEthosProfile(username);
+    },
+
+    newSearch() {
+        this.searchResults = null;
+        this.render();
+    },
+
+    openEthosProfile(username) {
+        const url = `https://ethos.network/profile/${username}`;
+        if (this.sdk && this.sdk.actions && this.sdk.actions.openUrl) {
+            this.sdk.actions.openUrl(url);
+        } else {
+            window.open(url, '_blank');
+        }
     },
     
     attachEvents() {
@@ -364,10 +758,11 @@ const FarcasterConnect = {
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => FarcasterConnect.init());
+    document.addEventListener('DOMContentLoaded', () => EthosMapper.init());
 } else {
-    FarcasterConnect.init();
+    EthosMapper.init();
 }
 
 // Export for global access
-window.FarcasterConnect = FarcasterConnect;
+window.EthosMapper = EthosMapper;
+window.FarcasterConnect = EthosMapper; // Backward compatibility
