@@ -19,13 +19,12 @@
     <meta property="og:image" content="https://via.placeholder.com/1200x630/8b5cf6/ffffff?text=Farcaster+Search+-+Ethos+Network" />
     <meta property="og:url" content="https://ethoschannel.netlify.app/" />
     
-    <!-- Load Styles -->
-    <script src="styles.js"></script>
-    <!-- Load Official Farcaster SDK -->
-    <script src="farcaster-sdk.js"></script>
-    <script src="farcaster-api.js"></script>
-    <script src="frame-handler.js"></script>
-    <script src="farcaster-mini-app.js"></script>
+    <!-- Load Official Farcaster Mini App SDK -->
+    <script type="module">
+        import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk';
+        window.sdk = sdk;
+    </script>
+    <script src="official-mini-app.js"></script>
 </head>
 <body>
     <!-- App Container -->
@@ -37,8 +36,7 @@
         </div>
     </div>
     
-    <!-- Load Main Application -->
-    <script src="index.js"></script>
+    <!-- Official Mini App loads itself -->
     
     <!-- Fallback for no JavaScript -->
     <noscript>

@@ -1,45 +1,43 @@
 {
   "name": "farcaster-mini-app-ethos",
-  "version": "4.0.0",
-  "description": "Official Farcaster Mini App - Ethos Network Search (2024 SDK)",
+  "version": "5.0.0",
+  "description": "Official Farcaster Mini App - Ethos Network Search (Official SDK)",
   "type": "module",
   "scripts": {
-    "build": "echo 'Building Farcaster Mini App with 2024 SDK'",
+    "build": "echo 'Building with Official @farcaster/miniapp-sdk'",
     "dev": "echo 'Development server'",
-    "start": "echo 'Starting Mini App'"
+    "start": "echo 'Starting Official Mini App'"
   },
   "dependencies": {
-    "@farcaster/auth-kit": "^0.4.0",
-    "@farcaster/core": "^0.15.0"
+    "@farcaster/miniapp-sdk": "^0.1.0"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0"
+    "@types/node": "^22.11.0"
   },
   "keywords": [
     "farcaster",
     "mini-app",
     "web3",
     "ethos-network",
-    "frames",
-    "2024-sdk"
+    "official-sdk"
   ],
   "license": "MIT",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.11.0"
   },
   "farcaster": {
-    "version": "2024",
+    "version": "official",
+    "sdk": "@farcaster/miniapp-sdk",
     "features": [
+      "context",
       "quickAuth",
-      "haptics", 
+      "actions",
+      "haptics",
       "backNavigation",
+      "ethereumWallet",
+      "solanaWallet",
       "events",
       "miniAppDetection"
-    ],
-    "pending": [
-      "actions.swapToken",
-      "actions.sendToken", 
-      "wallet.getEthereumProvider"
     ]
   }
 }

@@ -5,45 +5,37 @@
     "signature": "MHhmOGQ1YzQyMmU3ZTZlMWNhMzU1YWI5ZjE2NzIwMzQ1NjdmOGQ5YzEyMzQ1Njc4OTBhYmNkZWY"
   },
   "frame": {
-    "version": "2024-01",
+    "version": "vNext",
     "name": "Farcaster Search - Ethos Network",
-    "subtitle": "Discover user reputation on Ethos Network",
-    "description": "Search and discover Farcaster users with comprehensive reputation data from Ethos Network. View user scores, XP, reviews, and vouches all in one place.",
+    "subtitle": "Official Mini App - Discover user reputation",
+    "description": "Official Farcaster Mini App built with @farcaster/miniapp-sdk. Search and discover Farcaster users with comprehensive reputation data from Ethos Network. Features Quick Auth, Haptics, and seamless wallet integration.",
     "iconUrl": "https://via.placeholder.com/192x192/8b5cf6/ffffff?text=FC",
     "homeUrl": "https://ethoschannel.netlify.app",
     "splashImageUrl": "https://via.placeholder.com/512x512/1a1a2e/8b5cf6?text=Loading",
     "splashBackgroundColor": "#1a1a2e",
-    "heroImageUrl": "https://via.placeholder.com/1200x630/8b5cf6/ffffff?text=Farcaster+Search+-+Ethos+Network",
-    "tagline": "Discover user reputation on Ethos Network",
+    "heroImageUrl": "https://via.placeholder.com/1200x630/8b5cf6/ffffff?text=Official+Farcaster+Mini+App",
+    "tagline": "Official Mini App - Discover user reputation on Ethos Network",
     "screenshotUrls": [
-      "https://via.placeholder.com/400x800/8b5cf6/ffffff?text=Search+Interface",
-      "https://via.placeholder.com/400x800/3b82f6/ffffff?text=User+Profile",
-      "https://via.placeholder.com/400x800/10b981/ffffff?text=Reputation+Data"
+      "https://via.placeholder.com/400x800/8b5cf6/ffffff?text=Official+SDK",
+      "https://via.placeholder.com/400x800/3b82f6/ffffff?text=Quick+Auth",
+      "https://via.placeholder.com/400x800/10b981/ffffff?text=Haptic+Feedback"
     ],
     "primaryCategory": "social",
-    "tags": ["reputation", "search", "farcaster", "ethos", "web3"],
+    "tags": ["reputation", "search", "farcaster", "ethos", "web3", "official-sdk"],
     "webhookUrl": "https://ethoschannel.netlify.app/api/webhook",
-    "features": {
-      "quickAuth": true,
-      "haptics": true,
-      "backNavigation": true,
-      "events": true,
-      "miniAppDetection": true,
-      "actions": {
-        "swapToken": false,
-        "sendToken": false
-      },
-      "wallet": {
-        "getEthereumProvider": false
-      }
-    },
-    "compatibility": {
-      "base": {
+    "sdk": {
+      "name": "@farcaster/miniapp-sdk",
+      "version": "latest",
+      "features": {
+        "context": true,
         "quickAuth": true,
+        "actions": true,
         "haptics": true,
         "backNavigation": true,
-        "actions": "eta-1-2-weeks",
-        "wallet": "eta-1-2-weeks"
+        "ethereumWallet": true,
+        "solanaWallet": true,
+        "events": true,
+        "miniAppDetection": true
       }
     }
   }
