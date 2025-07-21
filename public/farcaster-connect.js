@@ -75,6 +75,7 @@ const FarcasterConnect = {
         if (!app) return;
         
         const isInMiniApp = this.context?.client?.name !== 'web';
+        const fromFrame = new URLSearchParams(window.location.search).get('from') === 'frame';
         
         app.innerHTML = `
             <style>
@@ -183,6 +184,7 @@ const FarcasterConnect = {
                 
                 <div class="status">
                     ${isInMiniApp ? '📱 Running in Farcaster Mini App' : '🌐 Running in Web Browser'}
+                    ${fromFrame ? ' (Opened from Frame)' : ''}
                 </div>
                 
                 ${this.renderContent(isInMiniApp)}
@@ -200,9 +202,16 @@ const FarcasterConnect = {
         if (!isInMiniApp) {
             return `
                 <div class="web-notice">
-                    <h3>📱 Farcaster Mini App Required</h3>
-                    <p>To connect your Farcaster account, please open this app in a Farcaster client like Warpcast.</p>
-                    <p><strong>Copy this URL:</strong><br>https://ethoschannel.netlify.app</p>
+                    <h3>📱 ${fromFrame ? 'Frame Opened in Browser' : 'Farcaster Mini App Required'}</h3>
+                    <p>${fromFrame ? 
+                        'This Frame opened in your default browser. For full Farcaster integration, please open this link directly in Warpcast or another Farcaster client.' : 
+                        'To connect your Farcaster account, please open this app in a Farcaster client like Warpcast.'
+                    }</p>
+                    <p><strong>Try this:</strong><br>
+                    ${fromFrame ? 
+                        '1. Copy this URL: https://ethoschannel.netlify.app<br>2. Open Warpcast<br>3. Paste and visit the URL directly' :
+                        'Copy this URL: https://ethoschannel.netlify.app'
+                    }</p>
                 </div>
             `;
         }
