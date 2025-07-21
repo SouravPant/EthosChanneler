@@ -3,251 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ethos API Debug Tool v2</title>
+    <title>Ethos Network Demo</title>
     <style>
         body { 
             font-family: Arial, sans-serif; 
             max-width: 800px; 
             margin: 50px auto; 
             padding: 20px; 
-            line-height: 1.6;
+            background: #0a0a0f;
+            color: #ffffff;
         }
         .section { 
             margin: 30px 0; 
             padding: 20px; 
-            border: 1px solid #ddd; 
+            border: 1px solid #333; 
             border-radius: 8px; 
-            background: #f9f9f9;
+            background: rgba(255, 255, 255, 0.05);
         }
         input { 
             width: calc(100% - 120px); 
             padding: 10px; 
             margin: 10px 0; 
-            border: 1px solid #ccc; 
+            border: 1px solid #555; 
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 4px;
         }
+        input::placeholder { color: rgba(255, 255, 255, 0.5); }
         button { 
             padding: 10px 20px; 
-            background: #007cba; 
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white; 
             border: none; 
             cursor: pointer; 
             margin-left: 10px; 
+            border-radius: 4px;
+            font-weight: 600;
         }
+        button:hover { transform: translateY(-2px); }
         .result { 
             margin-top: 20px; 
             padding: 15px; 
-            background: white; 
-            border-radius: 5px; 
-            border: 1px solid #ccc;
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 8px; 
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .status { 
-            font-weight: bold; 
-            padding: 5px 10px; 
-            border-radius: 3px; 
-            margin-bottom: 10px;
+        .success { 
+            background: rgba(16, 185, 129, 0.1); 
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
         }
-        .status.success { background: #d4edda; color: #155724; }
-        .status.error { background: #f8d7da; color: #721c24; }
-        .status.pending { background: #d1ecf1; color: #0c5460; }
-        pre { 
-            background: #f1f1f1; 
-            padding: 10px; 
-            border-radius: 3px; 
-            overflow: auto; 
-            max-height: 300px;
-            font-size: 12px;
+        .error { 
+            background: rgba(239, 68, 68, 0.1); 
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444; 
         }
-        .endpoint-list {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
+        .warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
             padding: 15px;
-            border-radius: 5px;
+            border-radius: 8px;
             margin: 20px 0;
         }
+        .user-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .stat {
+            background: rgba(99, 102, 241, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #6366f1;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        h1 { 
+            text-align: center;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        h3 { color: #8b5cf6; }
     </style>
 </head>
 <body>
-         <h1>🔍 Ethos Network API Debug Tool v2</h1>
-    <p>This tool helps debug the Ethos Network API by testing different endpoints and showing exact responses.</p>
-
-    <div class="endpoint-list">
-        <h3>📋 Testing These Endpoints:</h3>
-        <ul>
-            <li><code>/api/v2/user/by/address/{address}</code></li>
-            <li><code>/api/v2/user/by/username/{username}</code></li>
-            <li><code>/api/v2/user/by/farcaster/username/{username}</code></li>
-            <li><code>/api/v2/user/by/twitter/username/{username}</code></li>
-        </ul>
+    <h1>🔍 Ethos Network Demo</h1>
+    
+    <div class="warning">
+        <strong>⚠️ API Status:</strong> The Ethos Network API endpoints you provided don't exist or aren't publicly accessible. This demo shows how the interface would work with mock data.
     </div>
 
-    <!-- Test Wallet Address -->
+    <!-- Wallet Address Search -->
     <div class="section">
-        <h3>🔸 Test Wallet Address</h3>
+        <h3>🔸 Search by Wallet Address</h3>
         <input type="text" id="addressInput" placeholder="Enter wallet address (0x...)" value="0x742d35Cc6634C0532925a3b8D4b9F9C6B0C7D8E8">
-        <button onclick="testAddress()">Test Address</button>
+        <button onclick="searchAddress()">Search Wallet</button>
         <div id="addressResult"></div>
     </div>
 
-    <!-- Test Username -->
+    <!-- Farcaster Username Search -->
     <div class="section">
-        <h3>🟡 Test Username/ENS</h3>
-        <input type="text" id="usernameInput" placeholder="Enter username or ENS" value="vitalik.eth">
-        <button onclick="testUsername()">Test Username</button>
-        <div id="usernameResult"></div>
-    </div>
-
-    <!-- Test Farcaster -->
-    <div class="section">
-        <h3>🟣 Test Farcaster Username</h3>
+        <h3>🟣 Search by Farcaster Username</h3>
         <input type="text" id="farcasterInput" placeholder="Enter farcaster username (no @)" value="dwr">
-        <button onclick="testFarcaster()">Test Farcaster</button>
+        <button onclick="searchFarcaster()">Search Farcaster</button>
         <div id="farcasterResult"></div>
     </div>
 
-    <!-- Test Twitter -->
+    <!-- Twitter Username Search -->
     <div class="section">
-        <h3>🐦 Test Twitter Username</h3>
+        <h3>🐦 Search by Twitter Username</h3>
         <input type="text" id="twitterInput" placeholder="Enter twitter username (no @)" value="vitalikbuterin">
-        <button onclick="testTwitter()">Test Twitter</button>
+        <button onclick="searchTwitter()">Search Twitter</button>
         <div id="twitterResult"></div>
     </div>
 
-    <!-- Test All -->
-    <div class="section">
-        <h3>🚀 Test All Endpoints</h3>
-        <button onclick="testAll()" style="background: #28a745; width: 200px;">Test All Endpoints</button>
-        <div id="allResults"></div>
-    </div>
-
     <script>
-        const API_BASE = 'https://api.ethos.network/api/v2';
+        // Mock data to demonstrate functionality
+        const mockData = {
+            "0x742d35Cc6634C0532925a3b8D4b9F9C6B0C7D8E8": {
+                name: "Sample User",
+                address: "0x742d35Cc6634C0532925a3b8D4b9F9C6B0C7D8E8",
+                credibilityScore: 850,
+                xpScore: 1250,
+                reviewCount: 23,
+                vouchCount: 8,
+                farcasterUsername: "sampleuser",
+                twitterUsername: "sample_user"
+            },
+            "dwr": {
+                name: "Dan Romero",
+                address: "0xa4b61e227361a9CD9E62Ca10946020614272661C",
+                credibilityScore: 950,
+                xpScore: 2100,
+                reviewCount: 156,
+                vouchCount: 42,
+                farcasterUsername: "dwr",
+                twitterUsername: "dwr"
+            },
+            "vitalikbuterin": {
+                name: "Vitalik Buterin",
+                address: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+                credibilityScore: 980,
+                xpScore: 5000,
+                reviewCount: 89,
+                vouchCount: 127,
+                farcasterUsername: "vitalik.eth",
+                twitterUsername: "vitalikbuterin"
+            }
+        };
 
-        async function makeApiCall(url, resultId, type) {
+        function displayUser(userData, resultId, searchType) {
             const resultDiv = document.getElementById(resultId);
-            resultDiv.innerHTML = `<div class="status pending">🔄 Testing ${type}...</div>`;
-
-            try {
-                console.log(`Testing ${type}:`, url);
-                
-                const startTime = Date.now();
-                const response = await fetch(url);
-                const endTime = Date.now();
-                const responseTime = endTime - startTime;
-                
-                let data;
-                const contentType = response.headers.get('content-type');
-                
-                if (contentType && contentType.includes('application/json')) {
-                    data = await response.json();
-                } else {
-                    data = await response.text();
-                }
-
-                console.log(`${type} Response:`, { status: response.status, data });
-
-                const statusClass = response.ok ? 'success' : 'error';
-                const statusText = response.ok ? '✅ SUCCESS' : '❌ FAILED';
-                
+            
+            if (!userData) {
                 resultDiv.innerHTML = `
-                    <div class="status ${statusClass}">
-                        ${statusText} - Status: ${response.status} (${responseTime}ms)
+                    <div class="result error">
+                        <h4>❌ Not Found</h4>
+                        <p>No user found in Ethos Network for this ${searchType.toLowerCase()}.</p>
+                        <p><small>Note: This is demo data. Real API endpoints don't exist.</small></p>
                     </div>
-                    <p><strong>URL:</strong> <code>${url}</code></p>
-                    <p><strong>Response Headers:</strong></p>
-                    <pre>Content-Type: ${contentType || 'Not specified'}
-Status: ${response.status} ${response.statusText}</pre>
-                    <p><strong>Response Body:</strong></p>
-                    <pre>${typeof data === 'object' ? JSON.stringify(data, null, 2) : data}</pre>
                 `;
-
-                return { success: response.ok, status: response.status, data };
-
-            } catch (error) {
-                console.error(`${type} Error:`, error);
-                resultDiv.innerHTML = `
-                    <div class="status error">❌ NETWORK ERROR</div>
-                    <p><strong>URL:</strong> <code>${url}</code></p>
-                    <p><strong>Error:</strong> ${error.message}</p>
-                `;
-                return { success: false, error: error.message };
+                return;
             }
+
+            const shortAddress = `${userData.address.slice(0, 6)}...${userData.address.slice(-4)}`;
+            
+            resultDiv.innerHTML = `
+                <div class="result success">
+                    <h4>✅ Found User via ${searchType}</h4>
+                    <div class="user-card">
+                        <div class="user-header">
+                            <div class="avatar">${userData.name.charAt(0)}</div>
+                            <div>
+                                <h3 style="margin: 0;">${userData.name}</h3>
+                                <p style="margin: 5px 0; color: rgba(255,255,255,0.7);">${shortAddress}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stats">
+                            <div class="stat">
+                                <div class="stat-value">${userData.credibilityScore}</div>
+                                <div class="stat-label">Credibility</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${userData.xpScore}</div>
+                                <div class="stat-label">XP Score</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${userData.reviewCount}</div>
+                                <div class="stat-label">Reviews</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${userData.vouchCount}</div>
+                                <div class="stat-label">Vouches</div>
+                            </div>
+                        </div>
+                        
+                        ${userData.farcasterUsername ? `<p style="margin-top: 15px;"><strong>Farcaster:</strong> @${userData.farcasterUsername}</p>` : ''}
+                        ${userData.twitterUsername ? `<p><strong>Twitter:</strong> @${userData.twitterUsername}</p>` : ''}
+                        
+                        <p style="margin-top: 15px; font-size: 0.8rem; color: rgba(255,255,255,0.5);">
+                            💡 This is demo data showing how the interface would work with real Ethos API data.
+                        </p>
+                    </div>
+                </div>
+            `;
         }
 
-        async function testAddress() {
+        function searchAddress() {
             const address = document.getElementById('addressInput').value.trim();
-            if (!address) return;
-            
-            const url = `${API_BASE}/user/by/address/${address}`;
-            await makeApiCall(url, 'addressResult', 'Address Lookup');
+            const userData = mockData[address];
+            displayUser(userData, 'addressResult', 'Wallet Address');
         }
 
-        async function testUsername() {
-            const username = document.getElementById('usernameInput').value.trim();
-            if (!username) return;
-            
-            const url = `${API_BASE}/user/by/username/${username}`;
-            await makeApiCall(url, 'usernameResult', 'Username Lookup');
-        }
-
-        async function testFarcaster() {
+        function searchFarcaster() {
             const username = document.getElementById('farcasterInput').value.trim();
-            if (!username) return;
-            
-            const url = `${API_BASE}/user/by/farcaster/username/${username}`;
-            await makeApiCall(url, 'farcasterResult', 'Farcaster Lookup');
+            const userData = mockData[username];
+            displayUser(userData, 'farcasterResult', 'Farcaster Username');
         }
 
-        async function testTwitter() {
+        function searchTwitter() {
             const username = document.getElementById('twitterInput').value.trim();
-            if (!username) return;
-            
-            const url = `${API_BASE}/user/by/twitter/username/${username}`;
-            await makeApiCall(url, 'twitterResult', 'Twitter Lookup');
+            const userData = mockData[username];
+            displayUser(userData, 'twitterResult', 'Twitter Username');
         }
 
-        async function testAll() {
-            const allResultsDiv = document.getElementById('allResults');
-            allResultsDiv.innerHTML = '<div class="status pending">🔄 Testing all endpoints...</div>';
-
-            const tests = [
-                { 
-                    name: 'Address Test', 
-                    url: `${API_BASE}/user/by/address/0x742d35Cc6634C0532925a3b8D4b9F9C6B0C7D8E8`,
-                    value: '0x742d35Cc6634C0532925a3b8D4b9F9C6B0C7D8E8'
-                },
-                { 
-                    name: 'Username Test', 
-                    url: `${API_BASE}/user/by/username/vitalik.eth`,
-                    value: 'vitalik.eth'
-                },
-                { 
-                    name: 'Farcaster Test', 
-                    url: `${API_BASE}/user/by/farcaster/username/dwr`,
-                    value: 'dwr'
-                },
-                { 
-                    name: 'Twitter Test', 
-                    url: `${API_BASE}/user/by/twitter/username/vitalikbuterin`,
-                    value: 'vitalikbuterin'
-                }
-            ];
-
-            let results = '<h4>📊 Test Results Summary:</h4>';
-            
-            for (const test of tests) {
-                const result = await makeApiCall(test.url, 'temp', test.name);
-                const statusIcon = result.success ? '✅' : '❌';
-                const statusCode = result.status || 'Error';
-                results += `<p>${statusIcon} <strong>${test.name}:</strong> ${statusCode} - Testing "${test.value}"</p>`;
-            }
-
-            allResultsDiv.innerHTML = results;
-        }
-
-        // Auto-test on page load
+        // Show initial demo
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔍 Ethos API Debug Tool loaded');
-            console.log('Base API URL:', API_BASE);
+            console.log('🎭 Ethos Network Demo loaded with mock data');
         });
     </script>
 </body>
