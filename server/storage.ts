@@ -1,9 +1,4 @@
 import {
-  users,
-  vouches,
-  reviews,
-  activities,
-  connections,
   type User,
   type InsertUser,
   type Vouch,
@@ -15,7 +10,10 @@ import {
   type Connection,
   type InsertConnection,
 } from "@shared/schema";
-import { db } from "./db";
+import { db, schema } from "./db";
+
+// Extract table references from schema
+const { users, vouches, reviews, activities, connections } = schema;
 import { eq, desc, and } from "drizzle-orm";
 
 export interface IStorage {
