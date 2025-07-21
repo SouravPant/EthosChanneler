@@ -347,13 +347,23 @@ async function showMyProfile() {
     }
 }
 
+// Format large numbers with K, M suffixes
+function formatNumber(num) {
+    if (num >= 1000000) {
+        return (num / 1000000).toFixed(1) + 'M';
+    } else if (num >= 1000) {
+        return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
+}
+
 function displayUser(userData, searchTerm, isMyProfile = false) {
     const resultsDiv = document.getElementById('results');
     if (!resultsDiv) return;
     
     const name = userData.displayName || userData.username || searchTerm;
     const score = userData.score || 0;
-    const xpTotal = userData.xpTotal || 0;
+    const xpTotal = formatNumber(userData.xpTotal || 0);
     const xpStreakDays = userData.xpStreakDays || 0;
     const status = userData.status || 'Active';
     
