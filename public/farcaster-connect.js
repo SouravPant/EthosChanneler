@@ -150,8 +150,8 @@ const EthosMapper = {
         const xpTotal = user.xpTotal || data.xpTotal || 0;
         const stats = user.stats || {};
         
-        // Convert Ethos score (0-5000+) to percentage (0-100)
-        const normalizedScore = Math.min(Math.round((rawScore / 50)), 100);
+        // Use REAL Ethos scores (no conversion)
+        const ethosScore = rawScore; // Show actual Ethos score (1493, 2500, etc.)
         
         // Extract review and vouch data
         const reviewStats = stats.review?.received || {};
@@ -165,34 +165,37 @@ const EthosMapper = {
         const vouchCount = vouchStats.count || 0;
         const vouchAmount = vouchStats.amountWeiTotal || '0';
         
-        // Calculate credibility based on reviews
+        // Calculate credibility based on reviews (0-100%)
         const credibilityScore = totalReviews > 0 ? 
             Math.round((positiveReviews / totalReviews) * 100) : 
-            normalizedScore;
+            Math.min(Math.round(rawScore / 50), 100); // Fallback percentage
         
-        // Calculate reputation based on normalized score
+        // Calculate reputation based on REAL Ethos score ranges
         let reputation = 'Unknown';
-        if (normalizedScore >= 90) reputation = 'Exceptional';
-        else if (normalizedScore >= 80) reputation = 'Highly Trusted';
-        else if (normalizedScore >= 70) reputation = 'Trusted';
-        else if (normalizedScore >= 60) reputation = 'Reliable';
-        else if (normalizedScore >= 40) reputation = 'Developing';
-        else if (normalizedScore > 0) reputation = 'New User';
+        if (rawScore >= 2000) reputation = 'Exceptional';
+        else if (rawScore >= 1500) reputation = 'Highly Trusted';
+        else if (rawScore >= 1000) reputation = 'Trusted';
+        else if (rawScore >= 500) reputation = 'Reliable';
+        else if (rawScore >= 100) reputation = 'Developing';
+        else if (rawScore > 0) reputation = 'New User';
+        
+        // Calculate trust level for display (still need 0-100 for visual)
+        const displayPercentage = Math.min(Math.round((rawScore / 25)), 100); // For visual circle
         
         return {
             username: username,
-            ethosScore: normalizedScore,
+            ethosScore: ethosScore, // REAL Ethos score (1493, etc.)
             credibilityScore: credibilityScore,
             reviews: totalReviews,
             vouches: vouchCount,
-            attestations: xpTotal > 0 ? Math.floor(xpTotal / 100) : 0, // Rough estimate
+            attestations: xpTotal > 0 ? Math.floor(xpTotal / 100) : 0,
             reputation: reputation,
-            trustLevel: this.calculateTrustLevel(normalizedScore),
+            trustLevel: this.calculateTrustLevel(displayPercentage), // For display only
             profileUrl: user.links?.profile || `https://ethos.network/profile/${username}`,
             lastUpdated: new Date().toISOString(),
             source: 'ethos_api',
-            description: user.description || `Ethos Score: ${rawScore} | XP: ${xpTotal}`,
-            rawScore: rawScore,
+            description: user.description || `Active Farcaster user with ${xpTotal} XP`,
+            displayPercentage: displayPercentage, // For visual circle (0-100)
             xpTotal: xpTotal
         };
     },
@@ -632,7 +635,8 @@ const EthosMapper = {
         if (!this.searchResults) return '';
         
         const data = this.searchResults;
-        const scoreColor = data.ethosScore >= 80 ? '#28a745' : data.ethosScore >= 60 ? '#ffc107' : '#dc3545';
+        // Color based on real Ethos score ranges
+        const scoreColor = data.ethosScore >= 1500 ? '#28a745' : data.ethosScore >= 1000 ? '#20c997' : data.ethosScore >= 500 ? '#ffc107' : '#dc3545';
         
         return `
             <div class="ethos-analysis">
@@ -643,7 +647,7 @@ const EthosMapper = {
                 
                 <div class="score-section">
                     <div class="main-score">
-                        <div class="score-circle" style="background: conic-gradient(${scoreColor} ${data.ethosScore * 3.6}deg, rgba(255,255,255,0.2) 0deg);">
+                        <div class="score-circle" style="background: conic-gradient(${scoreColor} ${(data.displayPercentage || data.ethosScore) * 3.6}deg, rgba(255,255,255,0.2) 0deg);">
                             <div class="score-inner">
                                 <span class="score-number">${data.ethosScore}</span>
                                 <span class="score-label">Ethos Score</span>
@@ -674,7 +678,7 @@ const EthosMapper = {
                 <div class="reputation-section">
                     <h3>🏆 Reputation: ${data.reputation}</h3>
                     ${data.description ? `<p>${data.description}</p>` : ''}
-                    ${data.rawScore ? `<p><strong>Raw Ethos Score:</strong> ${data.rawScore} ${data.xpTotal ? `| <strong>XP:</strong> ${data.xpTotal}` : ''}</p>` : ''}
+                    ${data.xpTotal ? `<p><strong>Total XP:</strong> ${data.xpTotal.toLocaleString()}</p>` : ''}
                     <p><small>Data source: ${data.source === 'ethos_api' ? 'Live Ethos Network API' : 'Demo Data'}</small></p>
                 </div>
                 
