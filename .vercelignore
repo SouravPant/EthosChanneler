@@ -1,0 +1,9 @@
+backup/
+.env
+.env.example
+.replit
+replit.md
+VERCEL_DEPLOYMENT.md
+node_modules/
+*.log
+.git/
