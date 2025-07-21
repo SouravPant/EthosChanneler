@@ -138,6 +138,12 @@
             font-size: 1.5rem;
             font-weight: bold;
         }
+        .user-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -159,6 +165,53 @@
             font-size: 0.85rem;
             color: rgba(255, 255, 255, 0.7);
             margin-top: 5px;
+        }
+        .user-details {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #8b5cf6;
+        }
+        .detail-value {
+            color: rgba(255, 255, 255, 0.9);
+            text-align: right;
+            max-width: 60%;
+            word-break: break-word;
+        }
+        .review-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .review-stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .review-stat .value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #10b981;
+        }
+        .review-stat .label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 3px;
         }
         details {
             margin-top: 20px;
@@ -198,10 +251,9 @@
                 <button onclick="searchFarcaster()" id="farcasterBtn">Search</button>
             </div>
             <div class="examples">
-                <span onclick="searchFarcasterExample('dwr')" class="example">dwr</span>
-                <span onclick="searchFarcasterExample('vitalik.eth')" class="example">vitalik.eth</span>
-                <span onclick="searchFarcasterExample('balajis.eth')" class="example">balajis.eth</span>
-                <span onclick="searchFarcasterExample('jessepollak')" class="example">jessepollak</span>
+                <span onclick="searchFarcasterExample('serpinxbt')" class="example">serpinxbt</span>
+                <span onclick="searchFarcasterExample('newtonhere')" class="example">newtonhere</span>
+                <span onclick="searchFarcasterExample('hrithik')" class="example">hrithik</span>
             </div>
             <div id="farcasterResult"></div>
         </div>
@@ -282,12 +334,66 @@
             const xpStreakDays = userData.xpStreakDays || 0;
             const status = userData.status || 'Unknown';
 
+            // Build avatar/image
+            let avatarHtml = '';
+            if (userData.avatarUrl) {
+                avatarHtml = `<img src="${userData.avatarUrl}" alt="${name}" class="user-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                             <div class="avatar" style="display: none;">${name.charAt(0).toUpperCase()}</div>`;
+            } else {
+                avatarHtml = `<div class="avatar">${name.charAt(0).toUpperCase()}</div>`;
+            }
+
+            // Build review stats if available
+            let reviewStatsHtml = '';
+            if (userData.stats && userData.stats.review && userData.stats.review.received) {
+                const reviews = userData.stats.review.received;
+                reviewStatsHtml = `
+                    <div class="review-stats">
+                        <div class="review-stat">
+                            <div class="value">${reviews.positive || 0}</div>
+                            <div class="label">Positive</div>
+                        </div>
+                        <div class="review-stat">
+                            <div class="value">${reviews.neutral || 0}</div>
+                            <div class="label">Neutral</div>
+                        </div>
+                        <div class="review-stat">
+                            <div class="value">${reviews.negative || 0}</div>
+                            <div class="label">Negative</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Build vouch stats if available
+            let vouchStatsHtml = '';
+            if (userData.stats && userData.stats.vouch) {
+                const vouch = userData.stats.vouch;
+                vouchStatsHtml = `
+                    <div class="user-details">
+                        <h4 style="margin: 0 0 10px 0; color: #8b5cf6;">💎 Vouch Statistics</h4>
+                        ${vouch.given ? `
+                            <div class="detail-row">
+                                <span class="detail-label">Vouches Given:</span>
+                                <span class="detail-value">${vouch.given.count || 0} (${vouch.given.amountWeiTotal || 0} Wei)</span>
+                            </div>
+                        ` : ''}
+                        ${vouch.received ? `
+                            <div class="detail-row">
+                                <span class="detail-label">Vouches Received:</span>
+                                <span class="detail-value">${vouch.received.count || 0} (${vouch.received.amountWeiTotal || 0} Wei)</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
             resultDiv.innerHTML = `
                 <div class="result success">
                     <h4>✅ Found User on Ethos Network</h4>
                     <div class="user-card">
                         <div class="user-header">
-                            <div class="avatar">${name.charAt(0).toUpperCase()}</div>
+                            ${avatarHtml}
                             <div>
                                 <h3 style="margin: 0; color: white;">${name}</h3>
                                 <p style="margin: 5px 0; color: rgba(255,255,255,0.7);">@${searchTerm}</p>
@@ -313,6 +419,43 @@
                                 <div class="stat-value">${userData.profileId || 'N/A'}</div>
                                 <div class="stat-label">Profile ID</div>
                             </div>
+                        </div>
+
+                        ${reviewStatsHtml ? `
+                            <div style="margin-top: 20px;">
+                                <h4 style="margin: 0 0 10px 0; color: #8b5cf6;">📊 Review Statistics</h4>
+                                ${reviewStatsHtml}
+                            </div>
+                        ` : ''}
+
+                        ${vouchStatsHtml}
+                        
+                        <div class="user-details">
+                            <h4 style="margin: 0 0 15px 0; color: #8b5cf6;">📋 Profile Details</h4>
+                            ${userData.id ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">User ID:</span>
+                                    <span class="detail-value">${userData.id}</span>
+                                </div>
+                            ` : ''}
+                            ${userData.username ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">Username:</span>
+                                    <span class="detail-value">${userData.username}</span>
+                                </div>
+                            ` : ''}
+                            ${userData.userkeys && userData.userkeys.length > 0 ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">User Keys:</span>
+                                    <span class="detail-value">${userData.userkeys.join(', ')}</span>
+                                </div>
+                            ` : ''}
+                            ${userData.avatarUrl ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">Avatar URL:</span>
+                                    <span class="detail-value"><a href="${userData.avatarUrl}" target="_blank" style="color: #8b5cf6;">View Image</a></span>
+                                </div>
+                            ` : ''}
                         </div>
                         
                         ${userData.links ? `
