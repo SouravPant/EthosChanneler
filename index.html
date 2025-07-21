@@ -540,7 +540,7 @@
                             type="text" 
                             class="search-input" 
                             id="searchInput"
-                            placeholder="Enter wallet address, ENS, or Farcaster username..."
+                            placeholder="Search: @username, vitalik.eth, or 0x123..."
                         />
                         <button class="search-btn" onclick="searchEthos()">
                             <i class="fas fa-search"></i>
@@ -548,7 +548,10 @@
                         </button>
                     </div>
                     <div style="margin-top: 1rem; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">
-                        Try: <code style="background: rgba(255,255,255,0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">vitalik.eth</code> or <code style="background: rgba(255,255,255,0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">@dwr.eth</code>
+                        Try: 
+                        <code onclick="searchExample('@dwr.eth')" style="background: rgba(139,92,246,0.1); padding: 0.2rem 0.5rem; border-radius: 4px; color: #8b5cf6; cursor: pointer; margin: 0.2rem;">@dwr.eth</code>
+                        <code onclick="searchExample('vitalik.eth')" style="background: rgba(99,102,241,0.1); padding: 0.2rem 0.5rem; border-radius: 4px; color: #6366f1; cursor: pointer; margin: 0.2rem;">vitalik.eth</code>
+                        <code onclick="searchExample('balajis')" style="background: rgba(16,185,129,0.1); padding: 0.2rem 0.5rem; border-radius: 4px; color: #10b981; cursor: pointer; margin: 0.2rem;">balajis</code>
                     </div>
                 </div>
                 
@@ -833,44 +836,115 @@
                 searchResults.classList.add('active');
 
                 let userData = null;
+                let searchType = '';
                 let searchEndpoint = '';
 
-                // Determine search type
+                // Determine search type and endpoint
                 if (query.startsWith('0x') && query.length === 42) {
                     // Ethereum address
+                    searchType = 'Ethereum Address';
                     searchEndpoint = `${ETHOS_API_BASE}/user/by/address/${query}`;
-                } else if (query.endsWith('.eth')) {
-                    // ENS name - resolve to address first
-                    searchEndpoint = `${ETHOS_API_BASE}/user/by/address/${query}`;
+                } else if (query.endsWith('.eth') || query.endsWith('.ens')) {
+                    // ENS name
+                    searchType = 'ENS Domain';
+                    // For ENS, we need to resolve it first or try direct lookup
+                    searchEndpoint = `${ETHOS_API_BASE}/user/by/username/${query}`;
                 } else if (query.startsWith('@')) {
-                    // Farcaster username
-                    searchEndpoint = `${ETHOS_API_BASE}/user/by/farcaster/username/${query.slice(1)}`;
+                    // Farcaster username (with @)
+                    searchType = 'Farcaster Username';
+                    const username = query.slice(1); // Remove @
+                    searchEndpoint = `${ETHOS_API_BASE}/user/by/farcaster/username/${username}`;
+                } else if (query.includes('.')) {
+                    // Likely a domain or username with extension
+                    searchType = 'Username/Domain';
+                    searchEndpoint = `${ETHOS_API_BASE}/user/by/username/${query}`;
                 } else {
-                    // General search
-                    searchEndpoint = `${ETHOS_API_BASE}/users/search?query=${encodeURIComponent(query)}`;
+                    // Farcaster username without @ or general search
+                    searchType = 'Farcaster/General Search';
+                    // Try Farcaster first, then general search
+                    searchEndpoint = `${ETHOS_API_BASE}/user/by/farcaster/username/${query}`;
                 }
+
+                console.log(`🔍 Searching ${searchType}: ${query}`);
+                console.log(`📡 Endpoint: ${searchEndpoint}`);
 
                 const response = await fetch(searchEndpoint);
                 
                 if (response.ok) {
                     const data = await response.json();
-                    displaySearchResults(Array.isArray(data) ? data : [data]);
+                    if (data && (data.address || data.id)) {
+                        displaySearchResults([data]);
+                    } else {
+                        throw new Error(`No ${searchType.toLowerCase()} found`);
+                    }
                 } else {
-                    throw new Error('User not found in Ethos Network');
+                    // If Farcaster search fails, try general search for non-address queries
+                    if (!query.startsWith('0x') && !query.endsWith('.eth') && searchType === 'Farcaster/General Search') {
+                        try {
+                            const generalSearch = await fetch(`${ETHOS_API_BASE}/users/search?query=${encodeURIComponent(query)}`);
+                            if (generalSearch.ok) {
+                                const generalData = await generalSearch.json();
+                                if (generalData && generalData.length > 0) {
+                                    displaySearchResults(generalData);
+                                    return;
+                                }
+                            }
+                        } catch (e) {
+                            console.log('General search also failed');
+                        }
+                    }
+                    throw new Error(`${searchType} "${query}" not found in Ethos Network`);
                 }
 
             } catch (error) {
                 console.error('Search error:', error);
-                searchResults.innerHTML = `
-                    <div style="text-align: center; padding: 2rem;">
-                        <h3 style="color: #ef4444; margin-bottom: 1rem;">Search Failed</h3>
-                        <p style="color: rgba(255, 255, 255, 0.7);">${error.message}</p>
-                        <button class="btn-secondary" onclick="document.getElementById('searchResults').classList.remove('active')" style="margin-top: 1rem;">
-                            Close
-                        </button>
-                    </div>
+                displaySearchNotFound(query, error.message);
+            }
+        }
+
+        // Display search not found with helpful suggestions
+        function displaySearchNotFound(query, errorMessage) {
+            const searchResults = document.getElementById('searchResults');
+            
+            let suggestions = '';
+            if (query.startsWith('0x')) {
+                suggestions = `
+                    <p style="color: rgba(255, 255, 255, 0.5); margin-top: 1rem;">This wallet address isn't registered on Ethos Network yet.</p>
+                    <p style="color: rgba(255, 255, 255, 0.5);">Try searching for active users:</p>
+                `;
+            } else {
+                suggestions = `
+                    <p style="color: rgba(255, 255, 255, 0.5); margin-top: 1rem;">Try these search formats:</p>
                 `;
             }
+
+            searchResults.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <h3 style="color: #f59e0b; margin-bottom: 1rem;">Not Found</h3>
+                    <p style="color: rgba(255, 255, 255, 0.7);">${errorMessage}</p>
+                    ${suggestions}
+                    <div style="margin: 1.5rem 0; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;">
+                        <button onclick="searchExample('vitalik.eth')" style="background: rgba(99,102,241,0.2); color: #6366f1; border: 1px solid rgba(99,102,241,0.3); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer;">
+                            vitalik.eth
+                        </button>
+                        <button onclick="searchExample('@dwr.eth')" style="background: rgba(139,92,246,0.2); color: #8b5cf6; border: 1px solid rgba(139,92,246,0.3); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer;">
+                            @dwr.eth
+                        </button>
+                        <button onclick="searchExample('balajis')" style="background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid rgba(16,185,129,0.3); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer;">
+                            balajis
+                        </button>
+                    </div>
+                    <button class="btn-secondary" onclick="document.getElementById('searchResults').classList.remove('active')" style="margin-top: 1rem;">
+                        Close
+                    </button>
+                </div>
+            `;
+        }
+
+        // Search example function
+        function searchExample(example) {
+            document.getElementById('searchInput').value = example;
+            searchEthos();
         }
 
         // Display search results
