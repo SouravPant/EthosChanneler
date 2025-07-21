@@ -11,7 +11,15 @@ const AppState = {
     isReady: false,
     
     async init() {
+        console.log('🚀 Starting Mini App initialization...');
+        
         try {
+            // Check if SDK loading failed
+            if (window.sdkLoadError) {
+                console.warn('⚠️ SDK load error detected:', window.sdkLoadError);
+                throw new Error('SDK failed to load');
+            }
+            
             // Wait for SDK to be available
             await this.waitForSDK();
             
@@ -28,28 +36,49 @@ const AppState = {
             
         } catch (error) {
             console.error('❌ Failed to initialize Mini App:', error);
+            console.log('🌐 Falling back to web mode...');
             this.initWebFallback();
         }
     },
     
     async waitForSDK() {
         let attempts = 0;
-        while (!window.sdk && attempts < 50) {
+        while (!window.sdk && attempts < 100) {
             await new Promise(resolve => setTimeout(resolve, 100));
             attempts++;
+            
+            if (attempts % 10 === 0) {
+                console.log(`⏳ Waiting for SDK... attempt ${attempts}/100`);
+            }
         }
         
         if (window.sdk) {
             sdk = window.sdk;
+            console.log('✅ SDK loaded successfully');
         } else {
+            console.warn('⚠️ SDK not available after 10 seconds, falling back');
             throw new Error('SDK not available');
         }
     },
     
     initWebFallback() {
-        console.log('🌐 Initializing web fallback');
+        console.log('🌐 Initializing web fallback (SDK not available)');
         this.context = { client: { name: 'web' } };
         this.isReady = true;
+        
+        // Create a mock SDK for web fallback
+        sdk = {
+            actions: {
+                ready: async () => console.log('🌐 Mock ready() called'),
+                openUrl: async (url) => window.open(url, '_blank')
+            },
+            haptics: {
+                success: async () => console.log('🌐 Mock haptic success'),
+                error: async () => console.log('🌐 Mock haptic error'),
+                impact: async () => console.log('🌐 Mock haptic impact')
+            }
+        };
+        
         this.render();
     },
     

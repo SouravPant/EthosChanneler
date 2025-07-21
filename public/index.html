@@ -19,12 +19,28 @@
     <meta property="og:image" content="https://via.placeholder.com/1200x630/8b5cf6/ffffff?text=Farcaster+Search+-+Ethos+Network" />
     <meta property="og:url" content="https://ethoschannel.netlify.app/" />
     
-    <!-- Load Official Farcaster Mini App SDK -->
+    <!-- Load Simple Farcaster App (immediate loading) -->
+    <script src="simple-farcaster-app.js"></script>
+    
+    <!-- Try to load Official SDK in background -->
     <script type="module">
-        import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk';
-        window.sdk = sdk;
+        try {
+            console.log('🚀 Loading @farcaster/miniapp-sdk in background...');
+            const { sdk } = await import('https://esm.sh/@farcaster/miniapp-sdk');
+            window.sdk = sdk;
+            console.log('✅ SDK loaded and assigned to window.sdk');
+            
+            // Update status if app is already loaded
+            if (window.SimpleApp) {
+                const statusEl = document.querySelector('.status');
+                if (statusEl) {
+                    statusEl.textContent = '✅ App Ready - SDK Loaded';
+                }
+            }
+        } catch (error) {
+            console.warn('⚠️ Failed to load SDK:', error);
+        }
     </script>
-    <script src="official-mini-app.js"></script>
 </head>
 <body>
     <!-- App Container -->
