@@ -3,12 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ethos Network - Web3 Reputation Platform WORKING</title>
+    <title>Ethos Network - Web3 Reputation Platform FIXED</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <!-- Web3 Integration -->
     <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <script>
+        // Ensure ethers is available globally
+        if (typeof ethers === 'undefined') {
+            console.error('Ethers.js failed to load');
+        } else {
+            console.log('✅ Ethers.js loaded successfully');
+        }
+    </script>
     
     <!-- Farcaster Frame Meta Tags -->
     <meta property="fc:frame" content="vNext" />
@@ -624,6 +632,9 @@
         let ethosUser = null;
         let web3Provider = null;
         const ETHOS_API_BASE = 'https://api.ethos.network/api/v2';
+        
+        // Test API connectivity on load
+        let apiAvailable = false;
 
         // Web3 Integration
         async function connectWallet() {
@@ -637,6 +648,11 @@
                 // Check if MetaMask is installed
                 if (typeof window.ethereum === 'undefined') {
                     throw new Error('Please install MetaMask to connect your wallet');
+                }
+
+                // Check if ethers is loaded
+                if (typeof ethers === 'undefined') {
+                    throw new Error('Web3 library not loaded. Please refresh the page.');
                 }
 
                 // Request account access - this will always show MetaMask popup
@@ -872,10 +888,13 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    if (data && (data.address || data.id)) {
+                    console.log('🔍 Search response:', data);
+                    
+                    // Validate that we got real Ethos data, not mock data
+                    if (data && (data.address || data.id) && data.address !== 'No address') {
                         displaySearchResults([data]);
                     } else {
-                        throw new Error(`No ${searchType.toLowerCase()} found`);
+                        throw new Error(`${searchType} "${query}" not found in Ethos Network`);
                     }
                 } else {
                     // If Farcaster search fails, try general search for non-address queries
@@ -898,7 +917,13 @@
 
             } catch (error) {
                 console.error('Search error:', error);
-                displaySearchNotFound(query, error.message);
+                
+                // If it's a network error, show a specific message
+                if (error.message.includes('fetch') || error.message.includes('Failed to fetch')) {
+                    displaySearchNotFound(query, 'Unable to connect to Ethos Network API. Please try again later.');
+                } else {
+                    displaySearchNotFound(query, error.message);
+                }
             }
         }
 
