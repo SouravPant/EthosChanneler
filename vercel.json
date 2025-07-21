@@ -1,9 +1,16 @@
 {
-  "buildCommand": "echo 'Static site ready'",
+  "version": 2,
+  "name": "farcaster-frame-v2",
+  "buildCommand": "echo 'Static build complete'",
   "outputDirectory": "public",
+  "installCommand": "echo 'No install needed'",
   "functions": {
-    "api/frame.js": {},
-    "api/frame-image.js": {}
+    "api/frame.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/frame-image.js": {
+      "runtime": "nodejs18.x"
+    }
   },
   "headers": [
     {
