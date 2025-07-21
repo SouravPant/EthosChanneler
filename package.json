@@ -1,0 +1,10 @@
+{
+  "name": "farcaster-frame-app",
+  "version": "2.0.0",
+  "description": "Farcaster Frame - Ethos Network Search",
+  "scripts": {
+    "build": "echo 'Build complete - static files ready'"
+  },
+  "keywords": ["farcaster", "frame", "web3"],
+  "license": "MIT"
+}
