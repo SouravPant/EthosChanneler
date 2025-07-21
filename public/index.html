@@ -512,7 +512,7 @@
                     <i class="fas fa-wallet"></i>
                     Connect Wallet
                 </button>
-                <button class="farcaster-btn" id="connectFarcasterBtn" onclick="connectFarcaster()">
+                <button class="farcaster-btn" id="connectFarcasterBtn" onclick="connectFarcaster()" style="display: none;">
                     <i class="fab fa-twitter"></i>
                     Connect Farcaster
                 </button>
@@ -545,6 +545,9 @@
                             <i class="fas fa-search"></i>
                             Search
                         </button>
+                    </div>
+                    <div style="margin-top: 1rem; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">
+                        Try: <code style="background: rgba(255,255,255,0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">0x742d35Cc...</code> or <code style="background: rgba(255,255,255,0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">@vitalik.eth</code>
                     </div>
                 </div>
                 
@@ -716,30 +719,44 @@
         // Update wallet UI
         function updateWalletUI() {
             const connectBtn = document.getElementById('connectWalletBtn');
+            const farcasterBtn = document.getElementById('connectFarcasterBtn');
             const userProfile = document.getElementById('userProfile');
 
-            if (connectedWallet && ethosUser) {
+            if (connectedWallet) {
+                // Hide connect button and show user profile
                 connectBtn.style.display = 'none';
                 userProfile.classList.add('active');
+                
+                // Show user info even if ethosUser is not available yet
+                const displayName = ethosUser?.displayName || ethosUser?.username || `User ${connectedWallet.address.slice(-4)}`;
+                const credibilityScore = ethosUser?.credibilityScore || 0;
                 
                 userProfile.innerHTML = `
                     <div class="user-info">
                         <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${connectedWallet.address}" 
                              alt="Avatar" class="user-avatar">
                         <div>
-                            <div class="user-name">${ethosUser.displayName || ethosUser.username || 'Anonymous'}</div>
+                            <div class="user-name">${displayName}</div>
                             <div class="user-address">${connectedWallet.shortAddress}</div>
                         </div>
                     </div>
                     <div class="user-score">
                         <i class="fas fa-star"></i>
-                        Score: ${ethosUser.credibilityScore || 0}
+                        Score: ${credibilityScore}
                     </div>
                     <div class="connection-status">
                         <i class="fas fa-check-circle"></i>
-                        Verified
+                        Wallet Connected
                     </div>
                 `;
+                
+                // Show Farcaster button
+                farcasterBtn.style.display = 'inline-flex';
+            } else {
+                // Show connect button and hide profile
+                connectBtn.style.display = 'inline-flex';
+                userProfile.classList.remove('active');
+                farcasterBtn.style.display = 'none';
             }
         }
 
@@ -1009,6 +1026,36 @@
             }, type === 'error' ? 6000 : 4000);
         }
 
+        // Check for existing wallet connection
+        async function checkExistingConnection() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        const address = accounts[0];
+                        
+                        // Initialize ethers provider
+                        web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+                        
+                        // Store wallet info
+                        connectedWallet = {
+                            address: address,
+                            shortAddress: `${address.slice(0, 6)}...${address.slice(-4)}`
+                        };
+
+                        // Fetch user data from Ethos API
+                        await fetchEthosUserData(address);
+
+                        // Update UI
+                        updateWalletUI();
+                        console.log('✅ Wallet already connected:', connectedWallet.shortAddress);
+                    }
+                } catch (error) {
+                    console.log('No existing wallet connection found');
+                }
+            }
+        }
+
         // Search on Enter key
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('searchInput');
@@ -1017,6 +1064,9 @@
                     searchEthos();
                 }
             });
+
+            // Check for existing wallet connection
+            checkExistingConnection();
 
             // Load stats
             loadEthosStats();
