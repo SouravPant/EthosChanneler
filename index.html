@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ethos Network Demo</title>
+    <title>Ethos Network API Test</title>
     <style>
         body { 
             font-family: Arial, sans-serif; 
@@ -58,14 +58,6 @@
             border-color: rgba(239, 68, 68, 0.3);
             color: #ef4444; 
         }
-        .warning {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: #f59e0b;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
         .user-card {
             background: rgba(255, 255, 255, 0.1);
             padding: 20px;
@@ -118,13 +110,32 @@
             -webkit-text-fill-color: transparent;
         }
         h3 { color: #8b5cf6; }
+        .endpoint-info {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+        code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
     </style>
 </head>
 <body>
-    <h1>🔍 Ethos Network Demo</h1>
+    <h1>🔍 Ethos Network API Test</h1>
     
-    <div class="warning">
-        <strong>⚠️ API Status:</strong> The Ethos Network API endpoints you provided don't exist or aren't publicly accessible. This demo shows how the interface would work with mock data.
+    <div class="endpoint-info">
+        <strong>📡 API Endpoints Being Tested:</strong><br>
+        • <code>/api/v2/user/by/address/{address}</code><br>
+        • <code>/api/v2/user/by/farcaster/{username}</code><br>
+        • <code>/api/v2/user/by/twitter/{username}</code><br>
+        • <code>/api/v2/user/by/username/{username}</code>
     </div>
 
     <!-- Wallet Address Search -->
@@ -151,94 +162,102 @@
         <div id="twitterResult"></div>
     </div>
 
-    <script>
-        // Mock data to demonstrate functionality
-        const mockData = {
-            "0x742d35Cc6634C0532925a3b8D4b9F9C6B0C7D8E8": {
-                name: "Sample User",
-                address: "0x742d35Cc6634C0532925a3b8D4b9F9C6B0C7D8E8",
-                credibilityScore: 850,
-                xpScore: 1250,
-                reviewCount: 23,
-                vouchCount: 8,
-                farcasterUsername: "sampleuser",
-                twitterUsername: "sample_user"
-            },
-            "dwr": {
-                name: "Dan Romero",
-                address: "0xa4b61e227361a9CD9E62Ca10946020614272661C",
-                credibilityScore: 950,
-                xpScore: 2100,
-                reviewCount: 156,
-                vouchCount: 42,
-                farcasterUsername: "dwr",
-                twitterUsername: "dwr"
-            },
-            "vitalikbuterin": {
-                name: "Vitalik Buterin",
-                address: "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
-                credibilityScore: 980,
-                xpScore: 5000,
-                reviewCount: 89,
-                vouchCount: 127,
-                farcasterUsername: "vitalik.eth",
-                twitterUsername: "vitalikbuterin"
-            }
-        };
+    <!-- Username/ENS Search -->
+    <div class="section">
+        <h3>🟡 Search by Username/ENS</h3>
+        <input type="text" id="usernameInput" placeholder="Enter username or ENS" value="vitalik.eth">
+        <button onclick="searchUsername()">Search Username</button>
+        <div id="usernameResult"></div>
+    </div>
 
-        function displayUser(userData, resultId, searchType) {
+    <script>
+        const API_BASE = 'https://api.ethos.network/api/v2';
+
+        async function makeApiCall(url, resultId, searchType) {
             const resultDiv = document.getElementById(resultId);
-            
-            if (!userData) {
+            resultDiv.innerHTML = `<div class="result" style="color: #60a5fa;">🔄 Searching ${searchType}...</div>`;
+
+            try {
+                console.log(`Testing ${searchType}:`, url);
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                console.log(`${searchType} Response:`, { status: response.status, data });
+                
+                if (response.ok && data) {
+                    displayUser(data, resultDiv, searchType);
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result error">
+                            <h4>❌ ${searchType} Not Found</h4>
+                            <p>No user found for this ${searchType.toLowerCase()}.</p>
+                            <p><strong>Status:</strong> ${response.status}</p>
+                            <p><strong>URL:</strong> <code>${url}</code></p>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error(`${searchType} Error:`, error);
                 resultDiv.innerHTML = `
                     <div class="result error">
-                        <h4>❌ Not Found</h4>
-                        <p>No user found in Ethos Network for this ${searchType.toLowerCase()}.</p>
-                        <p><small>Note: This is demo data. Real API endpoints don't exist.</small></p>
+                        <h4>❌ Network Error</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p><strong>URL:</strong> <code>${url}</code></p>
                     </div>
                 `;
-                return;
             }
+        }
 
-            const shortAddress = `${userData.address.slice(0, 6)}...${userData.address.slice(-4)}`;
-            
+        function displayUser(userData, resultDiv, searchType) {
+            const name = userData.displayName || userData.name || userData.username || userData.farcasterUsername || 'User';
+            const address = userData.address ? `${userData.address.slice(0, 6)}...${userData.address.slice(-4)}` : 'No address';
+            const score = userData.credibilityScore || 0;
+            const xp = userData.xpScore || userData.totalXP || 0;
+            const reviews = userData.reviewCount || 0;
+            const vouches = userData.vouchCount || 0;
+
             resultDiv.innerHTML = `
                 <div class="result success">
                     <h4>✅ Found User via ${searchType}</h4>
                     <div class="user-card">
                         <div class="user-header">
-                            <div class="avatar">${userData.name.charAt(0)}</div>
+                            <div class="avatar">${name.charAt(0).toUpperCase()}</div>
                             <div>
-                                <h3 style="margin: 0;">${userData.name}</h3>
-                                <p style="margin: 5px 0; color: rgba(255,255,255,0.7);">${shortAddress}</p>
+                                <h3 style="margin: 0;">${name}</h3>
+                                <p style="margin: 5px 0; color: rgba(255,255,255,0.7);">${address}</p>
+                                ${userData.bio ? `<p style="margin: 5px 0; font-style: italic;">${userData.bio}</p>` : ''}
                             </div>
                         </div>
                         
                         <div class="stats">
                             <div class="stat">
-                                <div class="stat-value">${userData.credibilityScore}</div>
+                                <div class="stat-value">${score}</div>
                                 <div class="stat-label">Credibility</div>
                             </div>
                             <div class="stat">
-                                <div class="stat-value">${userData.xpScore}</div>
+                                <div class="stat-value">${xp}</div>
                                 <div class="stat-label">XP Score</div>
                             </div>
                             <div class="stat">
-                                <div class="stat-value">${userData.reviewCount}</div>
+                                <div class="stat-value">${reviews}</div>
                                 <div class="stat-label">Reviews</div>
                             </div>
                             <div class="stat">
-                                <div class="stat-value">${userData.vouchCount}</div>
+                                <div class="stat-value">${vouches}</div>
                                 <div class="stat-label">Vouches</div>
                             </div>
                         </div>
                         
                         ${userData.farcasterUsername ? `<p style="margin-top: 15px;"><strong>Farcaster:</strong> @${userData.farcasterUsername}</p>` : ''}
                         ${userData.twitterUsername ? `<p><strong>Twitter:</strong> @${userData.twitterUsername}</p>` : ''}
+                        ${userData.userKey ? `<p style="margin-top: 10px; font-size: 0.8rem; color: rgba(255,255,255,0.5);">User Key: ${userData.userKey}</p>` : ''}
                         
-                        <p style="margin-top: 15px; font-size: 0.8rem; color: rgba(255,255,255,0.5);">
-                            💡 This is demo data showing how the interface would work with real Ethos API data.
-                        </p>
+                        <details style="margin-top: 15px;">
+                            <summary style="cursor: pointer; color: #8b5cf6;">Show Raw Data</summary>
+                            <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; margin-top: 10px; font-size: 0.8rem; overflow: auto;">${JSON.stringify(userData, null, 2)}</pre>
+                        </details>
                     </div>
                 </div>
             `;
@@ -246,26 +265,49 @@
 
         function searchAddress() {
             const address = document.getElementById('addressInput').value.trim();
-            const userData = mockData[address];
-            displayUser(userData, 'addressResult', 'Wallet Address');
+            if (!address) return;
+            
+            const url = `${API_BASE}/user/by/address/${address}`;
+            makeApiCall(url, 'addressResult', 'Address');
         }
 
         function searchFarcaster() {
             const username = document.getElementById('farcasterInput').value.trim();
-            const userData = mockData[username];
-            displayUser(userData, 'farcasterResult', 'Farcaster Username');
+            if (!username) return;
+            
+            const url = `${API_BASE}/user/by/farcaster/${username}`;
+            makeApiCall(url, 'farcasterResult', 'Farcaster');
         }
 
         function searchTwitter() {
             const username = document.getElementById('twitterInput').value.trim();
-            const userData = mockData[username];
-            displayUser(userData, 'twitterResult', 'Twitter Username');
+            if (!username) return;
+            
+            const url = `${API_BASE}/user/by/twitter/${username}`;
+            makeApiCall(url, 'twitterResult', 'Twitter');
         }
 
-        // Show initial demo
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🎭 Ethos Network Demo loaded with mock data');
+        function searchUsername() {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (!username) return;
+            
+            const url = `${API_BASE}/user/by/username/${username}`;
+            makeApiCall(url, 'usernameResult', 'Username/ENS');
+        }
+
+        // Enter key support
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const activeElement = document.activeElement;
+                if (activeElement.id === 'addressInput') searchAddress();
+                else if (activeElement.id === 'farcasterInput') searchFarcaster();
+                else if (activeElement.id === 'twitterInput') searchTwitter();
+                else if (activeElement.id === 'usernameInput') searchUsername();
+            }
         });
+
+        console.log('🔍 Ethos Network API Test loaded');
+        console.log('Base API URL:', API_BASE);
     </script>
 </body>
 </html>
