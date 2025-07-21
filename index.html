@@ -3,299 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ethos Network - Simple Search</title>
+    <title>Ethos API Test</title>
     <style>
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #0a0a0f;
-            color: #ffffff;
-            margin: 0;
-            padding: 2rem;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        h1 {
-            text-align: center;
-            font-size: 2.5rem;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 2rem;
-        }
-        .search-box {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        input {
-            flex: 1;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-        }
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        button {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .examples {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .example {
-            display: inline-block;
-            background: rgba(139, 92, 246, 0.2);
-            color: #8b5cf6;
-            padding: 0.5rem 1rem;
-            margin: 0.25rem;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-        .result {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2rem;
-            border-radius: 12px;
-            margin-top: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .avatar {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .stat {
-            background: rgba(99, 102, 241, 0.1);
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #6366f1;
-        }
-        .stat-label {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-top: 0.25rem;
-        }
-        .error {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-            margin-top: 2rem;
-        }
-        .loading {
-            text-align: center;
-            margin-top: 2rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; }
+        button { padding: 10px 20px; background: #007cba; color: white; border: none; cursor: pointer; }
+        .result { margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 5px; }
+        .error { background: #ffe6e6; color: #cc0000; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Ethos Network Search</h1>
-        
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Enter wallet address, ENS, or @farcaster username...">
-            <button onclick="search()" id="searchBtn">Search</button>
-        </div>
-        
-        <div class="examples">
-            <span onclick="searchExample('vitalik.eth')" class="example">vitalik.eth</span>
-            <span onclick="searchExample('@dwr.eth')" class="example">@dwr.eth</span>
-            <span onclick="searchExample('@balajis.eth')" class="example">@balajis.eth</span>
-        </div>
-        
-        <div id="results"></div>
-    </div>
+    <h1>Ethos Network API Test</h1>
+    
+    <input type="text" id="searchInput" placeholder="Enter: vitalik.eth, @dwr.eth, or wallet address">
+    <button onclick="search()">Search</button>
+    
+    <div id="result"></div>
 
     <script>
-        const API_BASE = 'https://api.ethos.network/api/v2';
-
-        function searchExample(term) {
-            document.getElementById('searchInput').value = term;
-            search();
-        }
-
         async function search() {
-            const input = document.getElementById('searchInput');
-            const button = document.getElementById('searchBtn');
-            const results = document.getElementById('results');
-            const query = input.value.trim();
-
-            if (!query) {
-                showError('Please enter a search term');
+            const input = document.getElementById('searchInput').value.trim();
+            const result = document.getElementById('result');
+            
+            if (!input) {
+                result.innerHTML = '<div class="error">Please enter something to search</div>';
                 return;
             }
 
-            button.disabled = true;
-            button.textContent = 'Searching...';
-            results.innerHTML = '<div class="loading">Searching Ethos Network...</div>';
+            result.innerHTML = 'Searching...';
 
             try {
-                let user = null;
-                let endpoint = '';
-
-                // Determine search type
-                if (query.startsWith('0x') && query.length === 42) {
-                    endpoint = `${API_BASE}/user/by/address/${query}`;
-                } else if (query.endsWith('.eth')) {
-                    endpoint = `${API_BASE}/user/by/username/${query}`;
-                } else if (query.startsWith('@')) {
-                    endpoint = `${API_BASE}/user/by/farcaster/username/${query.slice(1)}`;
+                let url = '';
+                
+                if (input.startsWith('0x') && input.length === 42) {
+                    url = `https://api.ethos.network/api/v2/user/by/address/${input}`;
+                } else if (input.endsWith('.eth')) {
+                    url = `https://api.ethos.network/api/v2/user/by/username/${input}`;
+                } else if (input.startsWith('@')) {
+                    url = `https://api.ethos.network/api/v2/user/by/farcaster/username/${input.slice(1)}`;
                 } else {
-                    endpoint = `${API_BASE}/user/by/farcaster/username/${query}`;
+                    url = `https://api.ethos.network/api/v2/user/by/farcaster/username/${input}`;
                 }
 
-                console.log('Searching:', endpoint);
-
-                const response = await fetch(endpoint);
+                console.log('API URL:', url);
                 
-                if (!response.ok) {
-                    throw new Error('User not found in Ethos Network');
-                }
-
-                user = await response.json();
+                const response = await fetch(url);
+                const data = await response.json();
                 
-                if (!user || (!user.address && !user.id && !user.userKey)) {
-                    throw new Error('User not found in Ethos Network');
+                console.log('API Response:', data);
+                
+                if (response.ok && data) {
+                    result.innerHTML = `
+                        <div class="result">
+                            <h3>✅ Found User</h3>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="result error">
+                            <h3>❌ Not Found</h3>
+                            <p>No user found for: ${input}</p>
+                        </div>
+                    `;
                 }
-
-                // Get additional data
-                await enrichUser(user);
-                displayUser(user);
-
+                
             } catch (error) {
-                showError(error.message);
-            } finally {
-                button.disabled = false;
-                button.textContent = 'Search';
+                console.error('Error:', error);
+                result.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
             }
         }
 
-        async function enrichUser(user) {
-            try {
-                // Get credibility score
-                if (user.address) {
-                    const scoreResponse = await fetch(`${API_BASE}/score/address?address=${user.address}`);
-                    if (scoreResponse.ok) {
-                        const scoreData = await scoreResponse.json();
-                        user.credibilityScore = scoreData.score || 0;
-                    }
-                }
-
-                // Get XP score
-                if (user.userKey) {
-                    const xpResponse = await fetch(`${API_BASE}/xp/user/${user.userKey}`);
-                    if (xpResponse.ok) {
-                        const xpData = await xpResponse.json();
-                        user.xpScore = xpData.totalXP || 0;
-                    }
-                }
-            } catch (error) {
-                console.log('Error enriching user data:', error);
-            }
-        }
-
-        function displayUser(user) {
-            const results = document.getElementById('results');
-            const name = user.displayName || user.name || user.username || user.farcasterUsername || 'User';
-            const address = user.address ? `${user.address.slice(0, 6)}...${user.address.slice(-4)}` : 'No address';
-            const score = user.credibilityScore || 0;
-            const xp = user.xpScore || 0;
-            const reviews = user.reviewCount || 0;
-            const vouches = user.vouchCount || 0;
-
-            results.innerHTML = `
-                <div class="result">
-                    <div class="user-info">
-                        <div class="avatar">${name.charAt(0).toUpperCase()}</div>
-                        <div>
-                            <h2>${name}</h2>
-                            <p style="color: rgba(255, 255, 255, 0.7);">${address}</p>
-                            ${user.bio ? `<p style="margin-top: 0.5rem; font-style: italic;">${user.bio}</p>` : ''}
-                        </div>
-                    </div>
-                    
-                    <div class="stats">
-                        <div class="stat">
-                            <div class="stat-value">${score}</div>
-                            <div class="stat-label">Credibility Score</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value">${xp}</div>
-                            <div class="stat-label">XP Score</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value">${reviews}</div>
-                            <div class="stat-label">Reviews</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value">${vouches}</div>
-                            <div class="stat-label">Vouches</div>
-                        </div>
-                    </div>
-                    
-                    ${user.farcasterUsername ? `<p style="margin-top: 1rem;"><strong>Farcaster:</strong> @${user.farcasterUsername}</p>` : ''}
-                    ${user.twitterUsername ? `<p><strong>Twitter:</strong> @${user.twitterUsername}</p>` : ''}
-                    ${user.userKey ? `<p style="margin-top: 1rem; font-size: 0.8rem; color: rgba(255,255,255,0.5);">User Key: ${user.userKey}</p>` : ''}
-                </div>
-            `;
-        }
-
-        function showError(message) {
-            document.getElementById('results').innerHTML = `
-                <div class="error">
-                    <h3>❌ ${message}</h3>
-                    <p>Try searching for: vitalik.eth, @dwr.eth, or @balajis.eth</p>
-                </div>
-            `;
-        }
-
-        // Enter key support
         document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                search();
-            }
+            if (e.key === 'Enter') search();
         });
     </script>
 </body>
