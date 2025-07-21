@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ethos Network User Search</title>
+    <title>Ethos Network - Farcaster Search</title>
     <style>
         body { 
             font-family: Arial, sans-serif; 
-            max-width: 800px; 
+            max-width: 700px; 
             margin: 50px auto; 
             padding: 20px; 
             background: #0a0a0f;
@@ -29,23 +29,24 @@
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
-            padding: 25px;
-            margin: 25px 0;
+            padding: 30px;
+            margin: 30px 0;
             text-align: left;
         }
         .search-section h3 {
             color: #8b5cf6;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            text-align: center;
         }
         .input-group {
             display: flex;
             gap: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         input { 
             flex: 1;
-            padding: 12px; 
+            padding: 15px; 
             border: 1px solid #555; 
             background: rgba(255, 255, 255, 0.1);
             color: white;
@@ -56,7 +57,7 @@
             color: rgba(255, 255, 255, 0.5); 
         }
         button { 
-            padding: 12px 24px; 
+            padding: 15px 30px; 
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white; 
             border: none; 
@@ -64,7 +65,7 @@
             border-radius: 6px;
             font-weight: 600;
             font-size: 16px;
-            min-width: 100px;
+            min-width: 120px;
         }
         button:hover { 
             transform: translateY(-2px); 
@@ -75,25 +76,26 @@
             transform: none;
         }
         .examples {
-            margin-top: 10px;
+            margin-top: 15px;
+            text-align: center;
         }
         .example {
             display: inline-block;
             background: rgba(139, 92, 246, 0.2);
             color: #8b5cf6;
-            padding: 6px 12px;
-            margin: 3px;
-            border-radius: 15px;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             border: 1px solid rgba(139, 92, 246, 0.3);
         }
         .example:hover {
             background: rgba(139, 92, 246, 0.3);
         }
         .result { 
-            margin-top: 20px; 
-            padding: 20px; 
+            margin-top: 25px; 
+            padding: 25px; 
             background: rgba(255, 255, 255, 0.1); 
             border-radius: 8px; 
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -114,61 +116,52 @@
         }
         .user-card {
             background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 15px;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .user-header {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 20px;
+            margin-bottom: 20px;
         }
         .avatar {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             font-weight: bold;
         }
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
         .stat {
             background: rgba(99, 102, 241, 0.1);
-            padding: 12px;
-            border-radius: 6px;
+            padding: 15px;
+            border-radius: 8px;
             text-align: center;
         }
         .stat-value {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
             color: #6366f1;
         }
         .stat-label {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: rgba(255, 255, 255, 0.7);
-            margin-top: 3px;
-        }
-        .api-info {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            color: #f59e0b;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            font-size: 0.9rem;
+            margin-top: 5px;
         }
         details {
-            margin-top: 15px;
+            margin-top: 20px;
         }
         summary {
             cursor: pointer;
@@ -177,23 +170,29 @@
         }
         pre {
             background: rgba(0, 0, 0, 0.4);
-            padding: 10px;
+            padding: 15px;
             border-radius: 6px;
             margin-top: 10px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             overflow: auto;
-            max-height: 200px;
+            max-height: 300px;
+        }
+        .footer-info {
+            text-align: center;
+            margin-top: 40px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔍 Ethos Network User Search</h1>
-        <p style="color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Search users on Ethos Network using Farcaster or Twitter</p>
+        <h1>🟣 Ethos Network</h1>
+        <p style="color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Search Farcaster users on Ethos Network</p>
         
         <!-- Farcaster Search -->
         <div class="search-section">
-            <h3>🟣 Search by Farcaster Username</h3>
+            <h3>Search by Farcaster Username</h3>
             <div class="input-group">
                 <input type="text" id="farcasterInput" placeholder="Enter Farcaster username (without @)" value="">
                 <button onclick="searchFarcaster()" id="farcasterBtn">Search</button>
@@ -202,28 +201,13 @@
                 <span onclick="searchFarcasterExample('dwr')" class="example">dwr</span>
                 <span onclick="searchFarcasterExample('vitalik.eth')" class="example">vitalik.eth</span>
                 <span onclick="searchFarcasterExample('balajis.eth')" class="example">balajis.eth</span>
+                <span onclick="searchFarcasterExample('jessepollak')" class="example">jessepollak</span>
             </div>
             <div id="farcasterResult"></div>
         </div>
 
-        <!-- Twitter Search -->
-        <div class="search-section">
-            <h3>🐦 Search by Twitter/Telegram ID</h3>
-            <div class="input-group">
-                <input type="text" id="twitterInput" placeholder="Enter Twitter/Telegram user ID" value="">
-                <button onclick="searchTwitter()" id="twitterBtn">Search</button>
-            </div>
-            <div class="examples">
-                <span onclick="searchTwitterExample('elonmusk')" class="example">elonmusk</span>
-                <span onclick="searchTwitterExample('VitalikButerin')" class="example">VitalikButerin</span>
-            </div>
-            <div id="twitterResult"></div>
-        </div>
-
-        <div class="api-info">
-            <strong>📡 API Info:</strong> Using Ethos Network API v2 endpoints<br>
-            • Farcaster: <code>/api/v2/user/by/farcaster/username/{username}</code><br>
-            • Twitter/Telegram: <code>/api/v2/user/by/telegram/{userId}</code>
+        <div class="footer-info">
+            <strong>📡 API:</strong> <code>/api/v2/user/by/farcaster/username/{username}</code>
         </div>
     </div>
 
@@ -260,9 +244,9 @@
                 console.log('Farcaster Response:', { status: response.status, data });
 
                 if (response.ok && data && data.user) {
-                    displayUser(data.user, resultDiv, 'Farcaster', username);
+                    displayUser(data.user, resultDiv, username);
                 } else if (response.ok && data) {
-                    displayUser(data, resultDiv, 'Farcaster', username);
+                    displayUser(data, resultDiv, username);
                 } else {
                     resultDiv.innerHTML = `
                         <div class="result error">
@@ -290,66 +274,8 @@
             }
         }
 
-        // Twitter Search Functions
-        function searchTwitterExample(userId) {
-            document.getElementById('twitterInput').value = userId;
-            searchTwitter();
-        }
-
-        async function searchTwitter() {
-            const userId = document.getElementById('twitterInput').value.trim();
-            const resultDiv = document.getElementById('twitterResult');
-            const searchBtn = document.getElementById('twitterBtn');
-
-            if (!userId) {
-                resultDiv.innerHTML = `<div class="result error">Please enter a Twitter/Telegram user ID</div>`;
-                return;
-            }
-
-            searchBtn.disabled = true;
-            searchBtn.textContent = 'Searching...';
-            resultDiv.innerHTML = `<div class="result loading">🔄 Searching for ${userId} on Ethos Network...</div>`;
-
-            try {
-                const url = `${API_BASE}/user/by/telegram/${userId}`;
-                console.log('Twitter/Telegram API URL:', url);
-
-                const response = await fetch(url);
-                const data = await response.json();
-
-                console.log('Twitter/Telegram Response:', { status: response.status, data });
-
-                if (response.ok && data) {
-                    displayUser(data, resultDiv, 'Twitter/Telegram', userId);
-                } else {
-                    resultDiv.innerHTML = `
-                        <div class="result error">
-                            <h4>❌ User Not Found</h4>
-                            <p>No user found for Twitter/Telegram ID: <strong>${userId}</strong></p>
-                            <p><small>Status: ${response.status}</small></p>
-                            <details>
-                                <summary>Show API Response</summary>
-                                <pre>${JSON.stringify(data, null, 2)}</pre>
-                            </details>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error('Twitter/Telegram Error:', error);
-                resultDiv.innerHTML = `
-                    <div class="result error">
-                        <h4>❌ Network Error</h4>
-                        <p>${error.message}</p>
-                    </div>
-                `;
-            } finally {
-                searchBtn.disabled = false;
-                searchBtn.textContent = 'Search';
-            }
-        }
-
         // Display User Function
-        function displayUser(userData, resultDiv, searchType, searchTerm) {
+        function displayUser(userData, resultDiv, searchTerm) {
             const name = userData.displayName || userData.username || searchTerm;
             const score = userData.score || 0;
             const xpTotal = userData.xpTotal || 0;
@@ -364,7 +290,7 @@
                             <div class="avatar">${name.charAt(0).toUpperCase()}</div>
                             <div>
                                 <h3 style="margin: 0; color: white;">${name}</h3>
-                                <p style="margin: 5px 0; color: rgba(255,255,255,0.7);">Found via ${searchType}</p>
+                                <p style="margin: 5px 0; color: rgba(255,255,255,0.7);">@${searchTerm}</p>
                                 <p style="margin: 5px 0; color: rgba(255,255,255,0.6); font-size: 0.9rem;">Status: ${status}</p>
                                 ${userData.description ? `<p style="margin: 10px 0; font-style: italic; color: rgba(255,255,255,0.8);">${userData.description}</p>` : ''}
                             </div>
@@ -373,7 +299,7 @@
                         <div class="stats">
                             <div class="stat">
                                 <div class="stat-value">${score}</div>
-                                <div class="stat-label">Score</div>
+                                <div class="stat-label">Credibility Score</div>
                             </div>
                             <div class="stat">
                                 <div class="stat-value">${xpTotal}</div>
@@ -390,14 +316,14 @@
                         </div>
                         
                         ${userData.links ? `
-                            <div style="margin-top: 15px;">
+                            <div style="margin-top: 20px;">
                                 <strong>🔗 Links:</strong><br>
                                 ${userData.links.profile ? `<a href="${userData.links.profile}" target="_blank" style="color: #8b5cf6;">Profile</a><br>` : ''}
                                 ${userData.links.scoreBreakdown ? `<a href="${userData.links.scoreBreakdown}" target="_blank" style="color: #8b5cf6;">Score Breakdown</a>` : ''}
                             </div>
                         ` : ''}
                         
-                        <details style="margin-top: 15px;">
+                        <details style="margin-top: 20px;">
                             <summary>Show Raw API Data</summary>
                             <pre>${JSON.stringify(userData, null, 2)}</pre>
                         </details>
@@ -413,15 +339,8 @@
             }
         });
 
-        document.getElementById('twitterInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchTwitter();
-            }
-        });
-
-        console.log('🔍 Ethos Network User Search loaded');
+        console.log('🟣 Ethos Network Farcaster Search loaded');
         console.log('Farcaster API:', API_BASE + '/user/by/farcaster/username/{username}');
-        console.log('Twitter/Telegram API:', API_BASE + '/user/by/telegram/{userId}');
     </script>
 </body>
 </html>
