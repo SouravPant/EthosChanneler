@@ -5,12 +5,11 @@
     "signature": "eZyYX5S_E3oIZuIk7US5G4wXRpR80752YuyZrqo2r90"
   },
   "frame": {
-    "name": "Ethos Mapper",
     "version": "1",
+    "name": "Ethos Mapper",
     "iconUrl": "https://via.placeholder.com/192x192/667eea/ffffff?text=EM",
     "homeUrl": "https://ethoschannel.netlify.app",
     "imageUrl": "https://via.placeholder.com/1200x630/667eea/ffffff?text=Ethos+Mapper",
-    "heroImageUrl": "https://via.placeholder.com/1200x628/667eea/ffffff?text=Ethos+Mapper+Hero",
     "splashImageUrl": "https://via.placeholder.com/200x200/667eea/ffffff?text=Loading",
     "splashBackgroundColor": "#667eea",
     "webhookUrl": "https://ethoschannel.netlify.app/api/webhook",
@@ -22,17 +21,10 @@
     ],
     "tags": [
       "social",
-      "messaging", 
-      "community",
       "profile",
       "connect",
       "ethos"
     ],
-    "tagline": "Ethos map to farcaster",
-    "buttonTitle": "Open mini app",
-    "ogTitle": "Ethos Mapper – Farcaster Profile Analysis",
-    "ogDescription": "Connect your Farcaster account for comprehensive Ethos network analysis and profile mapping",
-    "ogImageUrl": "https://via.placeholder.com/1200x630/667eea/ffffff?text=Ethos+Mapper+Social",
-    "castShareUrl": "https://warpcast.com/~/compose?text=Check+out+Ethos+Mapper%21+%F0%9F%97%BA%EF%B8%8F+https%3A%2F%2Fethoschannel.netlify.app"
+    "tagline": "Ethos map to farcaster"
   }
 }
