@@ -15,7 +15,7 @@
 <body>
     <h1>Ethos Network API Test</h1>
     
-    <input type="text" id="searchInput" placeholder="Enter: vitalik.eth, @dwr.eth, or wallet address">
+    <input type="text" id="searchInput" placeholder="Enter wallet address (0x...)">
     <button onclick="search()">Search</button>
     
     <div id="result"></div>
@@ -26,24 +26,19 @@
             const result = document.getElementById('result');
             
             if (!input) {
-                result.innerHTML = '<div class="error">Please enter something to search</div>';
+                result.innerHTML = '<div class="error">Please enter a wallet address</div>';
+                return;
+            }
+
+            if (!input.startsWith('0x') || input.length !== 42) {
+                result.innerHTML = '<div class="error">Please enter a valid wallet address (must start with 0x and be 42 characters)</div>';
                 return;
             }
 
             result.innerHTML = 'Searching...';
 
             try {
-                let url = '';
-                
-                if (input.startsWith('0x') && input.length === 42) {
-                    url = `https://api.ethos.network/api/v2/user/by/address/${input}`;
-                } else if (input.endsWith('.eth')) {
-                    url = `https://api.ethos.network/api/v2/user/by/username/${input}`;
-                } else if (input.startsWith('@')) {
-                    url = `https://api.ethos.network/api/v2/user/by/farcaster/username/${input.slice(1)}`;
-                } else {
-                    url = `https://api.ethos.network/api/v2/user/by/farcaster/username/${input}`;
-                }
+                const url = `https://api.ethos.network/api/v2/user/by/address/${input}`;
 
                 console.log('API URL:', url);
                 
