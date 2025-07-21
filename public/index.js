@@ -227,8 +227,35 @@ async function connectFarcaster() {
     }
     
     try {
+        // Use Official Farcaster SDK if available
+        if (farcasterSDK && farcasterSDK.isInMiniApp()) {
+            console.log('🔐 Using Official Farcaster SDK for authentication');
+            
+            const user = await farcasterSDK.connect();
+            if (user) {
+                connectedUser = {
+                    ...user,
+                    source: 'official_sdk'
+                };
+                AppState.setUser(connectedUser);
+                
+                if (connectBtn) {
+                    connectBtn.disabled = false;
+                    connectBtn.textContent = `Connected as @${user.username}`;
+                    connectBtn.style.backgroundColor = '#10b981';
+                }
+                
+                // Show success message with haptic feedback
+                displayConnectionSuccess(user);
+                farcasterSDK.success('Successfully connected!');
+                return;
+            }
+        }
+        
+        // Fallback to Frame handler
         if (frameHandler && frameHandler.isInFrame) {
-            // Real Frame connection
+            console.log('🖼️ Using Frame handler for connection');
+            
             const fcUser = await frameHandler.connectFarcaster();
             if (fcUser) {
                 connectedUser = {
@@ -243,21 +270,20 @@ async function connectFarcaster() {
                     connectBtn.style.backgroundColor = '#10b981';
                 }
                 
-                // Show success message
                 displayConnectionSuccess(fcUser);
                 return;
             }
         }
         
-        // Fallback for non-Frame context
+        // Web browser fallback
         if (connectBtn) {
             connectBtn.disabled = false;
-            connectBtn.textContent = 'Open in Farcaster';
+            connectBtn.textContent = 'Open in Farcaster Mini App';
             connectBtn.style.backgroundColor = '#8b5cf6';
         }
         
-        // Show Frame required message
-        displayFrameRequired();
+        // Show Mini App instructions
+        displayMiniAppRequired();
         
     } catch (error) {
         console.error('Farcaster connection error:', error);
@@ -269,6 +295,11 @@ async function connectFarcaster() {
         }
         
         displayConnectionError(error.message);
+        
+        // Trigger error haptic if available
+        if (farcasterSDK?.capabilities?.haptics) {
+            farcasterSDK.error('Connection failed');
+        }
     }
 }
 
@@ -294,28 +325,42 @@ function displayConnectionSuccess(user) {
     `;
 }
 
-function displayFrameRequired() {
+function displayMiniAppRequired() {
     const resultsDiv = document.getElementById('results');
     if (!resultsDiv) return;
     
     resultsDiv.innerHTML = `
         <div class="info-card">
-            <h4>🖼️ Farcaster Frame Required</h4>
-            <p>To connect your Farcaster profile, this app needs to be opened as a Frame within Farcaster.</p>
+            <h4>📱 Farcaster Mini App Required</h4>
+            <p>To connect your Farcaster profile, this app needs to be opened as a Mini App within Farcaster.</p>
             <div style="margin: 15px 0;">
-                <strong>How to use as a Frame:</strong>
+                <strong>How to use as a Mini App:</strong>
                 <ol style="text-align: left; margin: 10px 0; padding-left: 20px;">
                     <li>Copy this URL: <code>https://ethoschannel.netlify.app</code></li>
                     <li>Paste it in a Warpcast cast</li>
-                    <li>The Frame will appear with interactive buttons</li>
+                    <li>The Mini App will appear with Frame interface</li>
+                    <li>Click to open the full Mini App experience</li>
                     <li>Your Farcaster profile will be automatically connected</li>
                 </ol>
+            </div>
+            <div style="margin: 15px 0; padding: 15px; background: rgba(139, 92, 246, 0.2); border-radius: 8px;">
+                <strong>🚀 Official SDK Features:</strong>
+                <ul style="text-align: left; margin: 10px 0; padding-left: 20px;">
+                    <li>Quick Authentication with Farcaster</li>
+                    <li>Haptic feedback for interactions</li>
+                    <li>Native back button support</li>
+                    <li>Seamless Mini App experience</li>
+                </ul>
             </div>
             <p style="color: rgba(255,255,255,0.8);">
                 You can still search for other users without connecting.
             </p>
         </div>
     `;
+}
+
+function displayMiniAppInstructions() {
+    displayMiniAppRequired();
 }
 
 function displayConnectionError(message) {
@@ -711,12 +756,61 @@ function renderApp() {
     app.appendChild(createFooter());
 }
 
+// Global SDK instance
+let farcasterSDK = null;
+
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Farcaster integration
+    // Initialize Official Farcaster SDK
+    if (window.FarcasterSDK) {
+        farcasterSDK = new FarcasterSDK();
+        
+        // Listen for Official SDK events
+        document.addEventListener('farcasterUserAuthenticated', (event) => {
+            console.log('👤 Official SDK user authenticated:', event.detail);
+            connectedUser = event.detail;
+            AppState.setUser(event.detail);
+            
+            // Trigger haptic feedback
+            if (farcasterSDK?.capabilities?.haptics) {
+                farcasterSDK.success('User authenticated successfully!');
+            }
+        });
+        
+        document.addEventListener('farcasterAuthFailed', (event) => {
+            console.log('❌ Official SDK auth failed:', event.detail);
+            
+            // Trigger haptic feedback
+            if (farcasterSDK?.capabilities?.haptics) {
+                farcasterSDK.error('Authentication failed');
+            }
+        });
+        
+        document.addEventListener('farcasterBackPressed', (event) => {
+            console.log('⬅️ Back button pressed in Mini App');
+            
+            // Handle back navigation
+            const resultsDiv = document.getElementById('results');
+            if (resultsDiv && resultsDiv.innerHTML.trim()) {
+                // Clear results and go back to search
+                resultsDiv.innerHTML = '';
+                currentTab = 'search';
+                renderApp();
+            }
+        });
+        
+        document.addEventListener('showFarcasterMiniAppInstructions', (event) => {
+            // Show Mini App instructions for web users
+            displayMiniAppInstructions();
+        });
+        
+        console.log('🚀 Official Farcaster SDK initialized');
+    }
+    
+    // Initialize Farcaster API
     if (window.FarcasterAPI) {
         farcasterAPI = new FarcasterAPI();
-        console.log('🔗 Official Farcaster API initialized');
+        console.log('🔗 Farcaster API initialized');
     }
     
     if (window.FrameHandler) {
@@ -725,26 +819,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Set up Frame event listeners
         frameHandler.on('userConnected', (user) => {
-            console.log('👤 Farcaster user connected:', user);
+            console.log('👤 Frame user connected:', user);
             connectedUser = user;
             AppState.setUser(user);
-        });
-        
-        frameHandler.on('buttonClick', (data) => {
-            console.log('🔘 Frame button clicked:', data);
-            if (data.buttonIndex === 1) {
-                // Search button
-                if (data.inputText) {
-                    const input = document.getElementById('searchInput');
-                    if (input) {
-                        input.value = data.inputText;
-                        searchUser();
-                    }
-                }
-            } else if (data.buttonIndex === 2) {
-                // Connect & Search button
-                connectFarcaster();
-            }
         });
         
         console.log('🖼️ Frame Handler initialized');
@@ -762,22 +839,15 @@ document.addEventListener('DOMContentLoaded', function() {
             AppState.setUser(event.detail);
         });
         
-        document.addEventListener('frameSearch', (event) => {
-            console.log('🔍 Mini App search triggered:', event.detail);
-            const input = document.getElementById('searchInput');
-            if (input) {
-                input.value = event.detail;
-                searchUser();
-            }
-        });
-        
         console.log('🚀 Farcaster Mini App initialized');
     }
     
     renderApp();
     console.log('🟣 Farcaster Search App with Official SDK loaded');
-    console.log('Environment:', miniApp?.isFrameEnvironment() ? 'Farcaster Frame' : 'Web Browser');
+    console.log('Environment:', farcasterSDK?.isInMiniApp() ? 'Farcaster Mini App' : 'Web Browser');
+    console.log('SDK Capabilities:', farcasterSDK?.getCapabilities());
     console.log('Integrations:', {
+        officialSDK: !!farcasterSDK,
         farcasterAPI: !!farcasterAPI,
         frameHandler: !!frameHandler,
         miniApp: !!miniApp

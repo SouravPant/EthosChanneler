@@ -1,0 +1,29 @@
+{
+  "name": "farcaster-mini-app-ethos",
+  "version": "3.0.0",
+  "description": "Official Farcaster Mini App - Ethos Network Search",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Building Farcaster Mini App'",
+    "dev": "echo 'Development server'",
+    "start": "echo 'Starting Mini App'"
+  },
+  "dependencies": {
+    "@farcaster/auth-kit": "^0.3.4",
+    "@farcaster/core": "^0.14.14"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  },
+  "keywords": [
+    "farcaster",
+    "mini-app",
+    "web3",
+    "ethos-network",
+    "frames"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
