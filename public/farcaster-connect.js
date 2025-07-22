@@ -452,13 +452,14 @@ const EthosMapper = {
                             .search-input {
                                 margin: 20px 0;
                                 display: flex;
-                                justify-content: center;
+                                justify-content: flex-end;
                                 align-items: center;
                                 flex-wrap: wrap;
                                 gap: 10px;
                             }
                             .example-profiles {
                                 margin: 20px 0;
+                                text-align: right;
                             }
                             .btn-small {
                                 background: rgba(255,255,255,0.2);
@@ -580,9 +581,12 @@ const EthosMapper = {
                             .action-buttons {
                                 display: flex;
                                 gap: 10px;
-                                justify-content: center;
+                                justify-content: flex-end;
+                                align-items: center;
                                 flex-wrap: wrap;
-                                margin-top: 30px;
+                                margin-top: 20px;
+                                position: relative;
+                                right: 0;
                             }
             </style>
             
