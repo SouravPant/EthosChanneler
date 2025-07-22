@@ -74,11 +74,10 @@ const EthosMapper = {
                     const data = await response.json();
                     console.log('✅ Ethos API response:', data);
                     
-                    if (data && (data.id || data.userkey)) {
-                        // Get additional score data
-                        const userKey = data.userkey || data.id;
-                        const scoreData = await this.getEthosScore(userKey);
-                        profileData = this.processEthosData({...data, ...scoreData}, username);
+                    if (data && (data.user || data.id || data.score)) {
+                        // Process the data directly - no need for additional API calls
+                        profileData = this.processEthosData(data, username);
+                        console.log('✅ Processed profile data:', profileData);
                     } else {
                         console.warn('⚠️ No user data found for:', username);
                     }
@@ -180,6 +179,13 @@ const EthosMapper = {
         const rawScore = user.score || data.score || 0;
         const xpTotal = user.xpTotal || data.xpTotal || 0;
         const stats = user.stats || {};
+        
+        console.log('📊 Extracted values:', {
+            rawScore,
+            xpTotal,
+            hasStats: !!stats,
+            username
+        });
         
         // Use REAL Ethos scores (no conversion)
         const ethosScore = rawScore; // Show actual Ethos score (1493, 2500, etc.)
