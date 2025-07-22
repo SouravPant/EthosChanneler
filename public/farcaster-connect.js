@@ -720,7 +720,6 @@ const EthosMapper = {
                     <h3>🏆 Reputation: ${data.reputation}</h3>
                     ${data.description ? `<p>${data.description}</p>` : ''}
                     ${data.xpTotal ? `<p><strong>Total XP:</strong> ${data.xpTotal.toLocaleString()}</p>` : ''}
-                    <p><small>Data source: Live Ethos Network API</small></p>
                 </div>
                 
                 <div class="action-buttons">
