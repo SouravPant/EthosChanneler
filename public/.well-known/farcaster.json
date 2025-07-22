@@ -7,17 +7,17 @@
   "frame": {
     "version": "1",
     "name": "Ethos Mapper",
-    "iconUrl": "https://via.placeholder.com/192x192/667eea/ffffff?text=EM",
+    "iconUrl": "https://ethoschannel.netlify.app/image.png",
     "homeUrl": "https://ethoschannel.netlify.app",
-    "imageUrl": "https://via.placeholder.com/1200x630/667eea/ffffff?text=Ethos+Mapper",
-    "splashImageUrl": "https://via.placeholder.com/200x200/667eea/ffffff?text=Loading",
+    "imageUrl": "https://ethoschannel.netlify.app/image.png",
+    "splashImageUrl": "https://ethoschannel.netlify.app/image.png",
     "splashBackgroundColor": "#667eea",
     "webhookUrl": "https://ethoschannel.netlify.app/api/webhook",
     "description": "A simple and elegant Farcaster Mini App that allows you to connect your account and view your profile information using the official Farcaster SDK.",
     "subtitle": "Connect for Ethos analysis",
     "primaryCategory": "social",
     "screenshotUrls": [
-      "https://via.placeholder.com/400x800/667eea/ffffff?text=Ethos+Mapper+Screenshot"
+      "https://ethoschannel.netlify.app/image.png"
     ],
     "tags": [
       "social",
