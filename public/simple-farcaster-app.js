@@ -274,8 +274,8 @@ const SimpleApp = {
         const xpTotal = userData.xpTotal || 0;
         const reviews = userData.reviews || 0;
         const vouches = userData.vouches || 0;
-        // Use Twitter username if available, otherwise fallback to Farcaster username
-        const twitterUsername = (userData.links && userData.links.twitter) || userData.twitter_username || username;
+        // Use Ethos profile link from API if available, otherwise fallback
+        const profileUrl = (userData.links && userData.links.profile) || `https://ethos.network/profile/${username}`;
         
         results.innerHTML = `
             <div class="user-card">
@@ -300,7 +300,7 @@ const SimpleApp = {
                 </div>
                 
                 <div class="actions">
-                    <button class="btn primary" onclick="SimpleApp.openProfile('${twitterUsername}')">
+                    <button class="btn primary" onclick="SimpleApp.openProfile('${profileUrl}')">
                         📊 View Full Profile
                     </button>
                 </div>
@@ -332,13 +332,11 @@ const SimpleApp = {
         }
     },
     
-    async openProfile(username) {
-        const url = `https://ethos.network/profile/${username}`;
-        
+    async openProfile(profileUrl) {
         if (window.sdk?.actions) {
-            await window.sdk.actions.openUrl(url);
+            await window.sdk.actions.openUrl(profileUrl);
         } else {
-            window.open(url, '_blank');
+            window.open(profileUrl, '_blank');
         }
     }
 };
