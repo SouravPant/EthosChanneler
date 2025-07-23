@@ -270,12 +270,12 @@ const SimpleApp = {
         const results = document.getElementById('results');
         if (!results) return;
         
-        const score = userData.score || 0;
-        const xpTotal = userData.xpTotal || 0;
-        const reviews = userData.reviews || 0;
-        const vouches = userData.vouches || 0;
+        const score = (userData.user && userData.user.score) || userData.score || 0;
+        const xpTotal = (userData.user && userData.user.xpTotal) || userData.xpTotal || 0;
+        const reviews = (userData.user && userData.user.reviews) || userData.reviews || 0;
+        const vouches = (userData.user && userData.user.vouches) || userData.vouches || 0;
         // Use Ethos profile link from API if available, otherwise fallback
-        const profileUrl = (userData.links && userData.links.profile) || `https://ethos.network/profile/${username}`;
+        const profileUrl = (userData.user && userData.user.links && userData.user.links.profile) || (userData.links && userData.links.profile) || `https://ethos.network/profile/${username}`;
         console.log('userData:', userData);
         console.log('Ethos profile URL:', profileUrl);
         
