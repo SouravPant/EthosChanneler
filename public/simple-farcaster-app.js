@@ -278,6 +278,7 @@ const SimpleApp = {
         const profileUrl = (userData.user && userData.user.links && userData.user.links.profile) || (userData.links && userData.links.profile) || `https://ethos.network/profile/${username}`;
         console.log('userData:', userData);
         console.log('Ethos profile URL:', profileUrl);
+        const safeProfileUrl = encodeURIComponent(profileUrl);
         
         results.innerHTML = `
             <div class="user-card">
@@ -302,7 +303,7 @@ const SimpleApp = {
                 </div>
                 
                 <div class="actions">
-                    <button class="btn primary" onclick="SimpleApp.openProfile('${profileUrl}')">
+                    <button class="btn primary" onclick="SimpleApp.openProfile(decodeURIComponent('${safeProfileUrl}'))">
                         📊 View Full Profile
                     </button>
                 </div>
