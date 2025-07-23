@@ -234,7 +234,8 @@ const SimpleApp = {
             
             if (response.ok) {
                 const data = await response.json();
-                this.displayUser(data.user || data, username);
+                // Always pass the full API response to displayUser
+                this.displayUser(data, username);
                 
                 // Try haptic feedback if SDK is available
                 if (window.sdk?.haptics) {
@@ -269,16 +270,16 @@ const SimpleApp = {
     displayUser(userData, username) {
         const results = document.getElementById('results');
         if (!results) return;
-        
-        const score = (userData.user && userData.user.score) || userData.score || 0;
-        const xpTotal = (userData.user && userData.user.xpTotal) || userData.xpTotal || 0;
-        const reviews = (userData.user && userData.user.reviews) || userData.reviews || 0;
-        const vouches = (userData.user && userData.user.vouches) || userData.vouches || 0;
+        // Always extract from userData.user if present
+        const user = userData.user || userData;
+        const score = user.score || 0;
+        const xpTotal = user.xpTotal || 0;
+        const reviews = user.reviews || 0;
+        const vouches = user.vouches || 0;
         // Use Ethos profile link from API if available, otherwise fallback
-        const profileUrl = (userData.user && userData.user.links && userData.user.links.profile) || (userData.links && userData.links.profile) || `https://ethos.network/profile/${username}`;
+        const profileUrl = (user.links && user.links.profile) || `https://ethos.network/profile/${username}`;
         console.log('userData:', userData);
         console.log('Ethos profile URL:', profileUrl);
-        const safeProfileUrl = encodeURIComponent(profileUrl);
         
         results.innerHTML = `
             <div class="user-card">
@@ -303,7 +304,7 @@ const SimpleApp = {
                 </div>
                 
                 <div class="actions">
-                    <button class="btn primary" onclick="SimpleApp.openProfile(decodeURIComponent('${safeProfileUrl}'))">
+                    <button class="btn primary" onclick="SimpleApp.openProfile('${profileUrl}')">
                         📊 View Full Profile
                     </button>
                 </div>
