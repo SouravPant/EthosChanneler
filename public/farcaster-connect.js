@@ -219,6 +219,8 @@ const EthosMapper = {
         // Calculate trust level for display (still need 0-100 for visual)
         const displayPercentage = Math.min(Math.round((rawScore / 25)), 100); // For visual circle
         
+        // Use Twitter username if available, otherwise fallback to Farcaster username
+        const twitterUsername = user.links?.twitter || user.twitter_username || username;
         return {
             username: username,
             ethosScore: ethosScore, // REAL Ethos score (1493, etc.)
@@ -228,7 +230,7 @@ const EthosMapper = {
             attestations: xpTotal > 0 ? Math.floor(xpTotal / 100) : 0,
             reputation: reputation,
             trustLevel: this.calculateTrustLevel(displayPercentage), // For display only
-            profileUrl: user.links?.profile || `https://ethos.network/profile/${username}`,
+            profileUrl: user.links?.profile || `https://ethos.network/profile/${twitterUsername}`,
             lastUpdated: new Date().toISOString(),
             source: 'ethos_api',
             description: user.description || `Active Farcaster user with ${xpTotal} XP`,

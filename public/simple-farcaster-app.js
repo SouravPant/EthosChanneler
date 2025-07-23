@@ -274,6 +274,8 @@ const SimpleApp = {
         const xpTotal = userData.xpTotal || 0;
         const reviews = userData.reviews || 0;
         const vouches = userData.vouches || 0;
+        // Use Twitter username if available, otherwise fallback to Farcaster username
+        const twitterUsername = (userData.links && userData.links.twitter) || userData.twitter_username || username;
         
         results.innerHTML = `
             <div class="user-card">
@@ -298,7 +300,7 @@ const SimpleApp = {
                 </div>
                 
                 <div class="actions">
-                    <button class="btn primary" onclick="SimpleApp.openProfile('${username}')">
+                    <button class="btn primary" onclick="SimpleApp.openProfile('${twitterUsername}')">
                         📊 View Full Profile
                     </button>
                 </div>
