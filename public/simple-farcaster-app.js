@@ -276,6 +276,8 @@ const SimpleApp = {
         const vouches = userData.vouches || 0;
         // Use Ethos profile link from API if available, otherwise fallback
         const profileUrl = (userData.links && userData.links.profile) || `https://ethos.network/profile/${username}`;
+        console.log('userData:', userData);
+        console.log('Ethos profile URL:', profileUrl);
         
         results.innerHTML = `
             <div class="user-card">
