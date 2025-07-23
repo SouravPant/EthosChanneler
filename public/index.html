@@ -26,6 +26,9 @@
             const { sdk } = await import('https://esm.sh/@farcaster/miniapp-sdk');
             window.sdk = sdk;
             console.log('✅ SDK loaded successfully');
+            // Notify Farcaster that the Mini App is ready
+            await sdk.actions.ready();
+            console.log('✅ Farcaster Mini App is ready!');
         } catch (error) {
             console.error('❌ Failed to load SDK:', error);
         }
