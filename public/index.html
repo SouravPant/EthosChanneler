@@ -33,12 +33,72 @@
     
     <!-- Load Simple Farcaster Connect App -->
     <script src="farcaster-connect.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+            font-family: 'Inter', 'Roboto', 'Open Sans', Arial, sans-serif;
+            color: #222;
+            margin: 0;
+            min-height: 100vh;
+        }
+        #app {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(30, 41, 59, 0.12), 0 1.5px 4px rgba(30, 41, 59, 0.08);
+            padding: 48px 36px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            margin: 24px;
+        }
+        .card h2 {
+            color: #3949ab;
+            margin-bottom: 16px;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .card p {
+            color: #555;
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+        .noscript-card {
+            background: #1a1a2e;
+            color: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(30, 41, 59, 0.12), 0 1.5px 4px rgba(30, 41, 59, 0.08);
+            padding: 48px 36px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            margin: 24px auto;
+            font-family: 'Inter', 'Roboto', 'Open Sans', Arial, sans-serif;
+        }
+        .noscript-card h2 {
+            color: #ef4444;
+            margin-bottom: 16px;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        @media (max-width: 600px) {
+            .card, .noscript-card {
+                padding: 24px 8px;
+                max-width: 98vw;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- App Container -->
     <div id="app">
         <!-- JavaScript will render the app here -->
-        <div style="text-align: center; padding: 50px; color: #667eea;">
+        <div class="card">
             <h2>🗺️ Loading Ethos Mapper...</h2>
             <p>Preparing to analyze your Farcaster profile...</p>
         </div>
@@ -48,7 +108,7 @@
     
     <!-- Fallback for no JavaScript -->
     <noscript>
-        <div style="text-align: center; padding: 50px; color: #ef4444; background: #1a1a2e; font-family: Arial, sans-serif;">
+        <div class="noscript-card">
             <h2>⚠️ JavaScript Required</h2>
             <p>This Farcaster Frame application requires JavaScript to function.</p>
             <p>Please enable JavaScript in your browser and refresh the page.</p>
